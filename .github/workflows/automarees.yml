@@ -32,4 +32,5 @@ jobs:
           git config user.email "autocode@marees.bot"
           git add index.php
           git diff --staged --quiet || git commit -m "🌊 AutoCode: amélioration automatique $(date '+%Y-%m-%d')"
+          git pull --rebase origin main
           git push
