@@ -2,10 +2,10 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.3.0 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.4.0 — Design professionnel avec animations immersives et visualisations améliorées
  */
 
-define('VERSION',   '3.3.0');
+define('VERSION',   '3.4.0');
 define('SITE_NAME', 'MaréesLive');
 define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
 
@@ -152,6 +152,7 @@ function fetchWorldTidesData(float $lat, float $lon, int $start, int $days = 7):
 }
 
 function processTideData(array $apiData, array $port): array {
+    global $JOURS, $MOIS;
     $days = [];
     $today_ts = mktime(0, 0, 0);
 
@@ -433,6 +434,7 @@ function generateInteractiveMap(array $ports, string $active_port): string {
 
     // Ports
     foreach ($ports as $key => $port) {
+        // Calcul des coordonnées SVG basées sur les coordonnées géographiques
         $x = 50 + ($port['lon'] + 2.5444) * 100; // Ajustement pour centrer la carte
         $y = 200 - ($port['lat'] - 47.1128) * 100; // Ajustement pour centrer la carte
         $is_active = $key === $active_port;
@@ -636,13 +638,12 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-wrap: wrap
+gap: 1rem;
 }
 .site-brand {
   font-size: .78rem;
-  font-weight: 7
-0;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .12em;
   color: var(--cyan);
@@ -1597,14 +1598,13 @@ svg {
     transition: color .2s ease;
   }
   footer a:hover {
-    color: #06b6d4;
-    text-decoration: underline;
+    color: #06b
+text-decoration: underline;
   }
   footer::before {
     content: '';
     position: absolute;
-   
-top: -1px;
+    top: -1px;
     left: 0;
     width: 100%;
     height: 1px;
