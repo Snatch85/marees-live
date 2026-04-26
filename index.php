@@ -2,10 +2,10 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.6.1 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.6.2 — Design professionnel avec animations immersives et visualisations améliorées
  */
 
-define('VERSION',   '3.6.1');
+define('VERSION',   '3.6.2');
 define('SITE_NAME', 'MaréesLive');
 define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
 
@@ -574,57 +574,85 @@ $navigationBadge = generateNavigationBadge($today_data);
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f0f9ff;
+  --bg: #f8fafc;
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   --surface: #ffffff;
   --surface2: #f8fafc;
   --surface3: #f1f5f9;
-  --border: rgba(0,0,0,.07);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(6, 182, 212, 0.3);
   --text: #1e293b;
   --text-light: #64748b;
+  --text-lighter: #94a3b8;
   --muted: #94a3b8;
   --cyan: #06b6d4;
+  --cyan-light: #67e8f9;
   --cyan-dark: #0891b2;
+  --cyan-darker: #155e75;
   --blue: #3b82f6;
   --blue-dark: #1d4ed8;
   --green: #10b981;
   --green-dark: #059669;
   --amber: #f59e0b;
+  --amber-light: #fbbf24;
   --amber-dark: #d97706;
   --red: #ef4444;
   --red-dark: #dc2626;
   --purple: #8b5cf6;
   --r: 16px;
+  --r-lg: 24px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'JetBrains Mono', 'Fira Code', monospace;
   --display: 'Playfair Display', serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
-  background-image:
-    radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 20%),
-    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+}
+
+/* ── Layout principal ── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 /* ── Header immersif ── */
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #f8fafc 0%, #f0f9ff 100%);
-  padding: 3rem 2rem 0;
-  min-height: 300px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(240, 249, 255,
+0.8) 100%);
+  padding: 4rem 0 6rem;
+  min-height: 400px;
+  box-shadow: var(--shadow-lg);
   background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
 }
+
 .hero::before {
   content: '';
   position: absolute;
@@ -632,24 +660,26 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9)
-css
-  0%, rgba(240, 249, 255, 0.9) 100%);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(240, 249, 255, 0.8) 100%);
   z-index: 1;
 }
+
 .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 2rem;
 }
+
 .hero-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 2rem;
 }
+
 .site-brand {
   font-size: 0.8rem;
   font-weight: 700;
@@ -661,26 +691,30 @@ css
   align-items: center;
   gap: 0.6rem;
   background: rgba(6, 182, 212, 0.1);
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 50px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(6, 182, 212, 0.2);
+  box-shadow: var(--shadow-sm);
 }
+
 .site-brand::before {
   content: "🌊";
   animation: wave 2s ease-in-out infinite;
 }
+
 @keyframes wave {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   25% { transform: translateY(-3px) rotate(5deg); }
   75% { transform: translateY(-3px) rotate(-5deg); }
 }
+
 .hero-port {
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
-  background: linear-gradient(135deg, var(--text), var(--cyan-dark));
+  background: linear-gradient(135deg, var(--text), var(--cyan-darker));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -688,33 +722,39 @@ css
   font-family: var(--display);
   margin-bottom: 0.5rem;
   position: relative;
+  display: inline-block;
 }
+
 .hero-port::after {
   content: attr(data-icon);
   position: absolute;
-  right: -1.5rem;
+  right: -2rem;
   top: 0.2rem;
-  font-size: 2rem;
+  font-size: 2.5rem;
   animation: float 3s ease-in-out infinite;
 }
+
 .hero-region {
-  color: var(--muted);
+  color: var(--text-light);
   font-size: 1.2rem;
   margin-top: 0.25rem;
   max-width: 600px;
   font-weight: 500;
 }
+
 .hero-date {
   text-align: right;
   font-size: 0.9rem;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.8);
-  padding: 0.5rem 1rem;
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.6rem 1.2rem;
   border-radius: 50px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-sm);
 }
+
 .hero-time {
   font-size: 2.8rem;
   font-weight: 700;
@@ -723,13 +763,14 @@ css
   text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
   margin-bottom: 0.3rem;
   background: rgba(6, 182, 212, 0.1);
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 12px;
   display: inline-block;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Vagues animées améliorées */
-.waves-wrap {
+/* ── Vagues animées ── */
+.waves {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -738,15 +779,13 @@ css
   z-index: 1;
   overflow: hidden;
 }
-.waves-wrap svg {
+
+.waves svg {
   width: 200%;
   height: 100%;
   animation: wave 15s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
 }
-@keyframes wave {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+
 .wave-path {
   fill: none;
   stroke: rgba(6, 182, 212, 0.15);
@@ -755,6 +794,7 @@ css
   stroke-linejoin: round;
   animation: wavePath 10s ease-in-out infinite alternate;
 }
+
 @keyframes wavePath {
   0% {
     stroke-dasharray: 0 100%;
@@ -768,25 +808,27 @@ css
   }
 }
 
-/* ── Sélecteur de ports ── */
+/* ── Navigation des ports ── */
 .port-nav {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+
 .port-nav-inner {
   display: flex;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   gap: 0;
 }
+
 .port-btn {
   display: flex;
   align-items: center;
@@ -794,18 +836,20 @@ css
   padding: 1rem 1.5rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--text-light);
   text-decoration: none;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
 }
+
 .port-btn:hover {
   color: var(--text);
   transform: translateY(-2px);
   background: rgba(6, 182, 212, 0.05);
 }
+
 .port-btn.active {
   color: var(--cyan-dark);
   border-bottom-color: var(--cyan);
@@ -813,6 +857,7 @@ css
   background: rgba(6, 182, 212, 0.1);
   box-shadow: 0 2px 8px rgba(6, 182, 212, 0.1);
 }
+
 .port-btn::after {
   content: '';
   position: absolute;
@@ -823,52 +868,42 @@ css
   background: var(--cyan);
   transition: width 0.3s ease;
 }
+
 .port-btn:hover::after, .port-btn.active::after {
   width: 100%;
 }
 
-/* ── Layout ── */
-.main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+/* ── Cartes principales ── */
+.card {
+  background: var(--surface);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
-/* ── Glassmorphism ── */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
 .glass-card {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--r);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  overflow: hidden;
 }
+
 .glass-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
   border-color: rgba(6, 182, 212, 0.3);
 }
 
-/* ── Cards ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
-}
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-}
 .card-header {
-  padding: 1rem 1.5rem;
+  padding: 1.2rem 1.5rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -877,10 +912,11 @@ css
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--muted);
+  color: var(--text-light);
   background: var(--surface2);
   position: relative;
 }
+
 .card-header::after {
   content: '';
   position: absolute;
@@ -891,6 +927,7 @@ css
   background: var(--cyan);
   border-radius: 1px;
 }
+
 .card-body {
   padding: 1.5rem;
 }
@@ -898,8 +935,9 @@ css
 /* ── Grille du haut ── */
 .top-grid {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 2rem;
+  margin: 2rem 0;
 }
 
 @media (max-width: 768px) {
@@ -908,19 +946,20 @@ css
   }
 }
 
-/* ── Coefficient ── */
+/* ── Carte du coefficient ── */
 .coeff-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.8rem;
   padding: 2rem 1rem;
   text-align: center;
   position: relative;
   background: radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
   border-radius: var(--r);
 }
+
 .coeff-number {
   font-size: 5rem;
   font-weight: 900;
@@ -933,6 +972,7 @@ css
   text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
   animation: pulse 2.5s infinite alternate;
 }
+
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -943,6 +983,7 @@ css
     text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
   }
 }
+
 .coeff-label {
   font-size: 0.85rem;
   font-weight: 700;
@@ -957,17 +998,20 @@ css
   box-shadow: 0 0 12px rgba(6, 182, 212, 0.08);
   transition: all 0.3s ease;
 }
+
 .coeff-label:hover {
   background: rgba(6, 182, 212, 0.25);
   transform: translateY(-1px);
 }
+
 .coeff-title {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--text-light);
   margin-top: 0.3rem;
   position: relative;
   padding-bottom: 0.3rem;
 }
+
 .coeff-title::after {
   content: '';
   position: absolute;
@@ -984,34 +1028,41 @@ css
   background: linear-gradient(135deg, var(--red), var(--red-dark));
   text-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
 }
+
 .coeff-vive .coeff-label {
   background: rgba(239, 68, 68, 0.15);
   color: var(--red-dark);
   border: 1px solid rgba(239, 68, 68, 0.3);
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.08);
 }
+
 .coeff-fort .coeff-number {
   background: linear-gradient(135deg, var(--amber), var(--amber-dark));
   text-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
 }
+
 .coeff-fort .coeff-label {
   background: rgba(245, 158, 11, 0.15);
   color: var(--amber-dark);
   border: 1px solid rgba(245, 158, 11, 0.3);
   box-shadow: 0 0 12px rgba(245, 158, 11, 0.08);
 }
+
 .coeff-moyen .coeff-number {
   background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
 }
+
 .coeff-moyen .coeff-label {
   background: rgba(6, 182, 212, 0.15);
   color: var(--cyan-dark);
   border: 1px solid rgba(6, 182, 212, 0.3);
 }
+
 .coeff-morte .coeff-number {
   background: linear-gradient(135deg, var(--green), var(--green-dark));
   text-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
 }
+
 .coeff-morte .coeff-label {
   background: rgba(16, 185, 129, 0.15);
   color: var(--green-dark);
@@ -1019,32 +1070,36 @@ css
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.08);
 }
 
-/* ── Jauge circulaire du coefficient ── */
+/* ── Jauge circulaire ── */
 .coeff-gauge-container {
   width: 100%;
   max-width: 220px;
   margin: 0 auto;
   position: relative;
 }
+
 .coeff-gauge {
   width: 100%;
   height: auto;
   margin-bottom: 1.5rem;
   transform: rotate(-90deg);
 }
+
 .coeff-gauge-info {
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--text-light);
   margin-top: 1rem;
 }
+
 .coeff-gauge-info span {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
 }
+
 .coeff-gauge-info .pip {
   width: 10px;
   height: 10px;
@@ -1052,6 +1107,7 @@ css
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
+
 .coeff-gauge-info .pip-vive { background: var(--red); }
 .coeff-gauge-info .pip-fort { background: var(--amber); }
 .coeff-gauge-info .pip-moyen { background: var(--cyan); }
@@ -1062,6 +1118,7 @@ css
   width: 100%;
   margin: 1.5rem 0;
 }
+
 .tide-progress {
   height: 24px;
   background: rgba(0, 0, 0, 0.05);
@@ -1071,6 +1128,7 @@ css
   box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
+
 .tide-progress-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--cyan), var(--cyan-dark));
@@ -1079,6 +1137,7 @@ css
   position: relative;
   box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
 }
+
 .tide-progress-bar::after {
   content: '';
   position: absolute;
@@ -1089,19 +1148,22 @@ css
   background: rgba(255, 255, 255, 0.5);
   box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
 }
+
 .tide-progress-info {
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--text-light);
   margin-top: 0.4rem;
   font-family: var(--mono);
 }
+
 .tide-progress-info span {
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
+
 .tide-progress-info .arrow {
   font-size: 0.9rem;
   animation: pulse 1.5s infinite alternate;
@@ -1116,6 +1178,7 @@ css
   height: 100%;
   align-content: center;
 }
+
 .tide-item {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -1125,13 +1188,15 @@ css
   position: relative;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
 }
+
 .tide-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   border-color: var(--cyan);
 }
+
 .tide-item::before {
   content: '';
   position: absolute;
@@ -1143,9 +1208,11 @@ css
   opacity: 0;
   transition: opacity 0.3s ease;
 }
+
 .tide-item:hover::before {
   opacity: 1;
 }
+
 .tide-badge {
   font-size: 0.65rem;
   font-weight: 800;
@@ -1160,17 +1227,20 @@ css
   border: 1px solid rgba(6, 182, 212, 0.2);
   transition: all 0.3s ease;
 }
+
 .tide-high .tide-badge {
   background: rgba(6, 182, 212, 0.15);
   color: var(--cyan-dark);
   border: 1px solid rgba(6, 182, 212, 0.3);
   animation: badgePulse 2.5s infinite;
 }
+
 .tide-low .tide-badge {
   background: rgba(245, 158, 11, 0.15);
   color: var(--amber-dark);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
+
 @keyframes badgePulse {
   0% {
     box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2);
@@ -1185,6 +1255,7 @@ css
     transform: scale(1);
   }
 }
+
 .tide-time {
   font-size: 1.8rem;
   font-weight: 800;
@@ -1197,21 +1268,24 @@ css
   background-clip: text;
   margin-bottom: 0.3rem;
 }
+
 .tide-height {
   font-size: 0.9rem;
-  color: var(--muted);
+  color: var(--text-light);
   margin-top: 0.3rem;
   font-family: var(--mono);
   font-weight: 500;
 }
+
 .tide-high .tide-height {
   color: var(--cyan-dark);
 }
+
 .tide-low .tide-height {
   color: var(--amber-dark);
 }
 
-/* ── Courbe ── */
+/* ── Courbe des marées ── */
 .curve-wrap {
   position: relative;
   width: 100%;
@@ -1221,22 +1295,26 @@ css
   padding: 1.5rem;
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border);
+  margin-top: 1.5rem;
 }
+
 .curve-svg {
   width: 100%;
   height: auto;
   display: block;
   filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.1));
 }
+
 .curve-wrap .axis-hours {
   display: flex;
   justify-content: space-between;
   padding: 0.6rem 0 0;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-light);
   font-family: var(--mono);
   position: relative;
 }
+
 .curve-wrap .axis-hours::before {
   content: '';
   position: absolute;
@@ -1247,34 +1325,36 @@ css
   background: linear-gradient(90deg, transparent, var(--border), transparent);
 }
 
-/* Animation de la courbe */
+/* Animations de la courbe */
 .curve-path {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
   animation: drawCurve 2.5s ease-out forwards;
 }
+
 @keyframes drawCurve {
   to { stroke-dashoffset: 0; }
 }
 
-/* Animation des points de marée */
 .tide-point {
   opacity: 0;
   animation: fadeIn 0.6s ease-out forwards;
 }
+
 @keyframes fadeIn {
   to { opacity: 1; }
 }
+
 .tide-point:nth-child(1) { animation-delay: 0.3s; }
 .tide-point:nth-child(2) { animation-delay: 0.6s; }
 .tide-point:nth-child(3) { animation-delay: 0.9s; }
 .tide-point:nth-child(4) { animation-delay: 1.2s; }
 
-/* Animation du curseur maintenant */
 .now-cursor {
   opacity: 0;
   animation: fadeIn 0.5s ease-out 1.5s forwards;
 }
+
 .now-text {
   opacity: 0;
   animation: fadeIn 0.5s ease-out 1.7s forwards;
@@ -1290,22 +1370,27 @@ css
   background: var(--surface2);
   border: 1px solid var(--border);
 }
+
 .days-table tr {
   border-bottom: 1px solid var(--border);
   transition: background 0.2s ease;
 }
+
 .days-table tr:last-child {
   border-bottom: none;
 }
+
 .days-table tr:hover td {
   background: var(--surface3);
 }
+
 .days-table td {
   padding: 1rem 1.2rem;
   font-size: 0.9rem;
   vertical-align: middle;
   position: relative;
 }
+
 .td-day {
   font-weight: 700;
   min-width: 130px;
@@ -1313,6 +1398,7 @@ css
   position: relative;
   font-family: var(--font);
 }
+
 .td-day::after {
   content: '';
   position: absolute;
@@ -1323,10 +1409,12 @@ css
   height: 60%;
   background: var(--border);
 }
+
 .td-coeff {
   min-width: 120px;
   text-align: center;
 }
+
 .coeff-pip {
   display: inline-flex;
   align-items: center;
@@ -1339,10 +1427,12 @@ css
   background: rgba(6, 182, 212, 0.08);
   transition: all 0.3s ease;
 }
+
 .coeff-pip:hover {
   background: rgba(6, 182, 212, 0.15);
   transform: translateY(-1px);
 }
+
 .pip {
   width: 10px;
   height: 10px;
@@ -1350,16 +1440,19 @@ css
   flex-shrink: 0;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
 }
+
 .pip-vive { background: var(--red); }
 .pip-fort { background: var(--amber); }
 .pip-moyen { background: var(--cyan); }
 .pip-morte { background: var(--green); }
+
 .td-tides {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
   justify-content: flex-end;
 }
+
 .mini-tide {
   display: flex;
   flex-direction: column;
@@ -1370,14 +1463,16 @@ css
   padding: 0.4rem 0.8rem;
   min-width: 72px;
   transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
 }
+
 .mini-tide:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   border-color: var(--cyan);
   background: rgba(6, 182, 212, 0.05);
 }
+
 .mini-tide-type {
   font-size: 0.62rem;
   font-weight: 800;
@@ -1387,23 +1482,27 @@ css
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
 }
+
 .mini-tide.high .mini-tide-type {
   color: var(--cyan-dark);
   background: rgba(6, 182, 212, 0.1);
 }
+
 .mini-tide.low .mini-tide-type {
   color: var(--amber-dark);
   background: rgba(245, 158, 11, 0.1);
 }
+
 .mini-tide-time {
   font-size: 0.85rem;
   font-weight: 700;
   font-family: var(--mono);
   color: var(--text);
 }
+
 .mini-tide-h {
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-light);
   font-family: var(--mono);
 }
 
@@ -1413,24 +1512,27 @@ css
   border-radius: var(--r);
   padding: 1.5rem;
   margin-top: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow);
   border: 1px solid var(--border);
 }
+
 .graph-30days-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
+
 .graph-30days-title {
   font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--muted);
+  color: var(--text-light);
   position: relative;
   padding-bottom: 0.5rem;
 }
+
 .graph-30days-title::after {
   content: '';
   position: absolute;
@@ -1440,16 +1542,19 @@ css
   height: 2px;
   background: var(--cyan);
 }
+
 .graph-30days-subtitle {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--text-light);
   margin-top: 0.3rem;
 }
+
 .graph-30days-container {
   width: 100%;
   overflow-x: auto;
   padding-bottom: 0.5rem;
 }
+
 .graph-30days-svg {
   min-width: 320px;
   width: 100%;
@@ -1462,9 +1567,10 @@ css
   border-radius: var(--r);
   padding: 2rem;
   margin-top: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow);
   border: 1px solid var(--border);
 }
+
 .know-card-header {
   font-size: 1.3rem;
   font-weight: 700;
@@ -1476,6 +1582,7 @@ css
   align-items: center;
   gap: 0.8rem;
 }
+
 .know-card-header::after {
   content: '';
   position: absolute;
@@ -1486,109 +1593,70 @@ css
   background: var(--cyan);
   border-radius: 2px;
 }
+
 .know-content {
   display: flex;
   gap: 2.5rem;
   align-items: flex-start;
 }
+
 @media (max-width: 768px) {
   .know-content {
     flex-direction: column;
     gap: 1.5rem;
   }
 }
+
 .know-image {
   flex: 1;
   min-width: 220px;
   border-radius: var(--r);
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   transition: transform 0.5s ease;
 }
+
 .know-image:hover {
   transform: scale(1.02);
 }
+
 .know-image img {
   width: 100%;
   height: auto;
   display: block;
   transition: transform 0.5s ease;
 }
+
 .know-image:hover img {
   transform: scale(1.05);
 }
+
 .know-text {
   flex: 2;
   font-size: 1rem;
   line-height: 1.7;
   color: var(--text-light);
 }
+
 .know-text p {
   margin-bottom: 1.2rem;
 }
+
 .know-text strong {
   color: var(--cyan-dark);
   font-weight: 600;
 }
+
 .know-fact {
   background: rgba(6, 182, 212, 0.08);
   border-left: 4px solid var(--cyan);
   padding: 1.2rem;
   margin: 1.8rem 0;
   border-radius: 0 var(--r) var(--r) 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
   font-style: italic;
   color: var(--text);
 }
-
-/* ── API Status ── */
-.api-status {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-.api-status.success {
-  color: var(--green-dark);
-  border-color: rgba(16, 185, 129, 0.2);
-  background: rgba(16, 185, 129, 0.1);
-}
-.api-status.error {
-  color: var(--red-dark);
-  border-color: rgba(239, 68, 68, 0.2);
-  background: rgba(239, 68, 68, 0.
-css
-2);
-}
-.api-status.warning {
-  color: var(--amber-dark);
-  border-color: rgba(245, 158, 11, 0.2);
-  background: rgba(245, 158, 11, 0.1);
-}
-.api-status::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 0.5rem;
-  box-shadow: 0 0 4px currentColor;
-}
-.api-status.success::before { background: var(--green); }
-.api-status.error::before { background: var(--red); }
-.api-status.warning::before { background: var(--amber); }
 
 /* ── Carte interactive ── */
 .map-card {
@@ -1596,15 +1664,16 @@ css
   border-radius: var(--r);
   padding: 2rem;
   margin-top: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow);
   border: 1px solid var(--border);
 }
+
 .map-card-header {
   font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--muted);
+  color: var(--text-light);
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
@@ -1612,6 +1681,7 @@ css
   position: relative;
   padding-bottom: 0.5rem;
 }
+
 .map-card-header::after {
   content: '';
   position: absolute;
@@ -1621,34 +1691,41 @@ css
   height: 2px;
   background: var(--cyan);
 }
+
 .interactive-map {
   width: 100%;
   height: auto;
   border-radius: var(--r);
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
 }
+
 .interactive-map:hover {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg);
 }
+
 .port-marker {
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
 }
+
 .port-marker:hover {
   r: 10;
   stroke-width: 3;
   stroke: var(--cyan);
   filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
 }
+
 .port-marker.active {
   r: 10;
   stroke-width: 3;
   fill: var(--cyan);
-  stroke: #ffffff;
+  stroke
+: #ffffff;
   filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.7));
 }
+
 .port-label {
   transition: all 0.3s ease;
   opacity: 0;
@@ -1656,134 +1733,118 @@ css
   font-weight: 600;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
 }
+
 .port-marker:hover + .port-label,
 .port-marker.active + .port-label {
   opacity: 1;
   transform: translateY(-5px);
 }
 
-/* ── Badge "Meilleur moment pour pêcher" ── */
-.fishing-badge {
+/* ── Badges d'activités ── */
+.activity-badge {
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  background: rgba(245, 158, 11, 0.08);
-  border-left: 4px solid var(--amber);
   padding: 1.5rem;
   border-radius: 0 var(--r) var(--r) 0;
   margin-top: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(245, 158, 11, 0.1);
-}
-.fishing-badge:hover {
-  transform: translateX(2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-.fishing-badge-icon {
-  font-size: 2.5rem;
-  animation: float 3s ease-in-out infinite;
-  background: rgba(245, 158, 11, 0.1);
-  padding: 0.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.fishing-badge-content {
-  flex: 1;
-}
-.fishing-badge-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--amber-dark);
-  margin-bottom: 0.4rem;
-  position: relative;
-  padding-bottom: 0.3rem;
-}
-.fishing-badge-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: var(--amber);
-}
-.fishing-badge-time {
-  font-size: 1.8rem;
-  font-weight: 800;
-  font-family: var(--mono);
-  color: var(--text);
-  margin-bottom: 0.3rem;
-  background: linear-gradient(135deg, var(--text), var(--amber-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.fishing-badge-info {
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-family: var(--mono);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* ── Badge "Meilleur moment pour surfer" ── */
+.activity-badge:hover {
+  transform: translateX(2px);
+  box-shadow: var(--shadow-md);
+}
+
+.fishing-badge {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 4px solid var(--amber);
+}
+
 .surfing-badge {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
   background: rgba(6, 182, 212, 0.08);
   border-left: 4px solid var(--cyan);
-  padding: 1.5rem;
-  border-radius: 0 var(--r) var(--r) 0;
-  margin-top: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(6, 182, 212, 0.1);
 }
-.surfing-badge:hover {
-  transform: translateX(2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+
+.navigation-badge {
+  background: rgba(29, 78, 216, 0.08);
+  border-left: 4px solid var(--blue);
 }
-.surfing-badge-icon {
+
+.activity-badge-icon {
   font-size: 2.5rem;
   animation: float 3s ease-in-out infinite;
-  background: rgba(6, 182, 212, 0.1);
   padding: 0.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.surfing-badge-content {
+
+.fishing-badge-icon {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.surfing-badge-icon {
+  background: rgba(6, 182, 212, 0.1);
+}
+
+.navigation-badge-icon {
+  background: rgba(29, 78, 216, 0.1);
+}
+
+.activity-badge-content {
   flex: 1;
 }
-.surfing-badge-title {
+
+.activity-badge-title {
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--cyan-dark);
   margin-bottom: 0.4rem;
   position: relative;
   padding-bottom: 0.3rem;
 }
-.surfing-badge-title::after {
+
+.activity-badge-title::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   width: 30px;
   height: 2px;
+}
+
+.fishing-badge-title::after {
+  background: var(--amber);
+}
+
+.surfing-badge-title::after {
   background: var(--cyan);
 }
-.surfing-badge-time {
+
+.navigation-badge-title::after {
+  background: var(--blue);
+}
+
+.fishing-badge-title {
+  color: var(--amber-dark);
+}
+
+.surfing-badge-title {
+  color: var(--cyan-dark);
+}
+
+.navigation-badge-title {
+  color: var(--blue-dark);
+}
+
+.activity-badge-time {
   font-size: 1.8rem;
   font-weight: 800;
   font-family: var(--mono);
@@ -1794,78 +1855,18 @@ css
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.surfing-badge-info {
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-family: var(--mono);
+
+.fishing-badge-time {
+  background: linear-gradient(135deg, var(--text), var(--amber-dark));
 }
 
-/* ── Badge "Meilleur moment pour naviguer" ── */
-.navigation-badge {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  background: rgba(29, 78, 216, 0.08);
-  border-left: 4px solid var(--blue);
-  padding: 1.5rem;
-  border-radius: 0 var(--r) var(--r) 0;
-  margin-top: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(29, 78, 216, 0.1);
-}
-.navigation-badge:hover {
-  transform: translateX(2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-.navigation-badge-icon {
-  font-size: 2.5rem;
-  animation: float 3s ease-in-out infinite;
-  background: rgba(29, 78, 216, 0.1);
-  padding: 0.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.navigation-badge-content {
-  flex: 1;
-}
-.navigation-badge-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--blue-dark);
-  margin-bottom: 0.4rem;
-  position: relative;
-  padding-bottom: 0.3rem;
-}
-.navigation-badge-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: var(--blue);
-}
 .navigation-badge-time {
-  font-size: 1.8rem;
-  font-weight: 800;
-  font-family: var(--mono);
-  color: var(--text);
-  margin-bottom: 0.3rem;
   background: linear-gradient(135deg, var(--text), var(--blue-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
-.navigation-badge-info {
+
+.activity-badge-info {
   font-size: 0.9rem;
-  color: var(--muted);
+  color: var(--text-light);
   font-family: var(--mono);
 }
 
@@ -1885,17 +1886,70 @@ css
   }
 }
 
+/* ── Status API ── */
+.api-status {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.api-status.success {
+  color: var(--green-dark);
+  border-color: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.api-status.error {
+  color: var(--red-dark);
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.api-status.warning {
+  color: var(--amber-dark);
+  border-color: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.api-status::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  box-shadow: 0 0 4px currentColor;
+}
+
+.api-status.success::before { background: var(--green); }
+.api-status.error::before { background: var(--red); }
+.api-status.warning::before { background: var(--amber); }
+
 /* ── Footer ── */
 footer {
   text-align: center;
   padding: 2.5rem;
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--text-light);
   border-top: 1px solid var(--border);
   margin-top: 3rem;
   position: relative;
   background: var(--surface);
 }
+
 footer::before {
   content: '';
   position: absolute;
@@ -1906,21 +1960,25 @@ footer::before {
   background: linear-gradient(180deg, transparent, var(--surface));
   pointer-events: none;
 }
+
 footer strong {
   color: var(--cyan-dark);
   font-weight: 600;
 }
+
 footer a {
   color: var(--cyan);
   text-decoration: none;
   transition: all 0.3s ease;
   font-weight: 500;
 }
+
 footer a:hover {
   color: var(--cyan-dark);
   text-decoration: underline;
   transform: translateY(-1px);
 }
+
 .footer-links {
   display: flex;
   justify-content: center;
@@ -1928,6 +1986,7 @@ footer a:hover {
   margin-top: 1rem;
   flex-wrap: wrap;
 }
+
 .footer-links a {
   display: flex;
   align-items: center;
@@ -1942,11 +2001,14 @@ footer a:hover {
   .hero-time {
     font-size: 2.2rem;
   }
+  .top-grid {
+    grid-template-columns: 240px 1fr;
+  }
 }
 
 @media (max-width: 768px) {
   .hero {
-    padding: 2rem 1rem 0;
+    padding: 2rem 0 4rem;
   }
   .hero-top {
     flex-direction: column;
@@ -1962,8 +2024,8 @@ footer a:hover {
   .hero-time {
     font-size: 1.8rem;
   }
-  .main {
-    padding: 1.5rem;
+  .container {
+    padding: 0 1rem;
   }
   .top-grid {
     grid-template-columns: 1fr;
@@ -1993,11 +2055,17 @@ footer a:hover {
     font-size: 1.3rem;
   }
   .port-nav-inner {
-    padding: 0 1rem;
+    padding: 0 0.5rem;
   }
   .port-btn {
     padding: 0.8rem 1rem;
     font-size: 0.8rem;
+  }
+  .card-header {
+    padding: 1rem;
+  }
+  .card-body {
+    padding: 1rem;
   }
 }
 </style>
@@ -2017,7 +2085,7 @@ footer a:hover {
       </div>
     </div>
   </div>
-  <div class="waves-wrap">
+  <div class="waves">
     <svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
       <path class="wave-path" d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" />
       <path class="wave-path" d="M0,70 C400,130 800,10 1200,70 L1200,120 L0,120 Z" style="animation-delay: -2s" />
@@ -2036,7 +2104,7 @@ footer a:hover {
   </div>
 </nav>
 
-<main class="main">
+<div class="container">
   <div class="top-grid">
     <div class="card glass-card">
       <div class="card-header">
@@ -2178,7 +2246,7 @@ footer a:hover {
     </div>
     <div class="card-body map-card">
       <?= $interactiveMap ?>
-      <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted); text-align: center;">
+      <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-light); text-align: center;">
         Cliquez sur un port pour afficher ses horaires de marée
       </div>
     </div>
@@ -2194,7 +2262,7 @@ footer a:hover {
       <?= $navigationBadge ?>
     </div>
   </div>
-</main>
+</div>
 
 <footer>
   <div>© <?= date('Y') ?> <strong><?= SITE_NAME ?></strong> — v<?= VERSION ?></div>
@@ -2224,7 +2292,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(updateTime, 1000);
 
   // Animation des badges d'activités
-  const badges = document.querySelectorAll('.fishing-badge, .surfing-badge, .navigation-badge');
+  const badges = document.querySelectorAll('.activity-badge');
   badges.forEach(badge => {
     badge.addEventListener('mouseenter', function() {
       this.style.transform = 'translateX(4px)';
@@ -2242,6 +2310,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     card.addEventListener('mouseleave', function() {
       this.style.transform = 'translateY(-4px)';
+    });
+  });
+
+  // Animation des boutons de navigation
+  const portButtons = document.querySelectorAll('.port-btn');
+  portButtons.forEach(button => {
+    button.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-3px)';
+    });
+    button.addEventListener('mouseleave', function() {
+      if (!this.classList.contains('active')) {
+        this.style.transform = 'translateY(0)';
+      }
     });
   });
 });
