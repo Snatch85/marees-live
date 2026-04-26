@@ -2,10 +2,11 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.4.0 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.5.0 — Design professionnel avec animations immersives et visualisations améliorées
+ * Ajout de fonctionnalités pour marins, pêcheurs et touristes
  */
 
-define('VERSION',   '3.4.0');
+define('VERSION',   '3.5.0');
 define('SITE_NAME', 'MaréesLive');
 define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
 
@@ -23,6 +24,9 @@ $PORTS = [
         'range_low'  => 1.2,
         'range_high' => 8.5,
         'desc'       => 'Port pittoresque avec vue sur l\'île de Noirmoutier',
+        'fishing_spots' => ['Pointe du Croisic', 'Anse du Château'],
+        'surf_spots' => ['Plage de Pen Bron'],
+        'sailing_areas' => ['Baie du Croisic', 'Passage du Croisic'],
     ],
     'la-turballe' => [
         'name'       => 'La Turballe',
@@ -33,6 +37,9 @@ $PORTS = [
         'range_low'  => 1.1,
         'range_high' => 8.2,
         'desc'       => 'Port de pêche et de plaisance',
+        'fishing_spots' => ['Port de La Turballe', 'Anse de Kervoyal'],
+        'surf_spots' => ['Plage de Kervoyal'],
+        'sailing_areas' => ['Baie de La Turballe', 'Passage de la Turballe'],
     ],
     'la-baule' => [
         'name'       => 'La Baule',
@@ -43,6 +50,9 @@ $PORTS = [
         'range_low'  => 1.3,
         'range_high' => 8.8,
         'desc'       => 'Station balnéaire renommée',
+        'fishing_spots' => ['Plage de La Baule', 'Pointe de Penchâteau'],
+        'surf_spots' => ['Plage de La Baule'],
+        'sailing_areas' => ['Baie de La Baule', 'Passage de Pornichet'],
     ],
     'pornichet' => [
         'name'       => 'Pornichet',
@@ -53,6 +63,9 @@ $PORTS = [
         'range_low'  => 1.4,
         'range_high' => 9.1,
         'desc'       => 'Ville balnéaire avec plage de sable fin',
+        'fishing_spots' => ['Plage de Bonne Anse', 'Anse de la Noë Blanche'],
+        'surf_spots' => ['Plage de Bonne Anse'],
+        'sailing_areas' => ['Baie de Pornichet', 'Passage de Saint-Nazaire'],
     ],
     'saint-nazaire' => [
         'name'       => 'Saint-Nazaire',
@@ -63,6 +76,9 @@ $PORTS = [
         'range_low'  => 1.5,
         'range_high' => 9.5,
         'desc'       => 'Port maritime important',
+        'fishing_spots' => ['Port de Saint-Nazaire', 'Estuaire de la Loire'],
+        'surf_spots' => ['Plage de Mindin'],
+        'sailing_areas' => ['Estuaire de la Loire', 'Passage de Saint-Nazaire'],
     ],
     'saint-brevin-les-pins' => [
         'name'       => 'Saint-Brevin-les-Pins',
@@ -73,6 +89,9 @@ $PORTS = [
         'range_low'  => 1.6,
         'range_high' => 9.8,
         'desc'       => 'Village de pêcheurs avec vue sur l\'estuaire',
+        'fishing_spots' => ['Plage de Saint-Brevin', 'Anse de la Courance'],
+        'surf_spots' => ['Plage de Saint-Brevin'],
+        'sailing_areas' => ['Estuaire de la Loire', 'Passage de Saint-Brevin'],
     ],
     'pornic' => [
         'name'       => 'Pornic',
@@ -83,6 +102,9 @@ $PORTS = [
         'range_low'  => 1.7,
         'range_high' => 10.2,
         'desc'       => 'Port de pêche traditionnel',
+        'fishing_spots' => ['Port de Pornic', 'Anse de la Noë Verte'],
+        'surf_spots' => ['Plage de la Noë Verte'],
+        'sailing_areas' => ['Baie de Bourgneuf', 'Passage de Pornic'],
     ],
     'prefailles' => [
         'name'       => 'Préfailles',
@@ -93,6 +115,9 @@ $PORTS = [
         'range_low'  => 1.8,
         'range_high' => 10.5,
         'desc'       => 'Port de pêche avec vue sur l\'estuaire',
+        'fishing_spots' => ['Port de Préfailles', 'Anse de la Courance'],
+        'surf_spots' => ['Plage de Préfailles'],
+        'sailing_areas' => ['Baie de Bourgneuf', 'Passage de Préfailles'],
     ],
     'piriac-sur-mer' => [
         'name'       => 'Piriac-sur-Mer',
@@ -103,6 +128,9 @@ $PORTS = [
         'range_low'  => 1.9,
         'range_high' => 10.8,
         'desc'       => 'Port de pêche avec vue sur l\'estuaire',
+        'fishing_spots' => ['Port de Piriac', 'Anse de Kervoyal'],
+        'surf_spots' => ['Plage de Piriac'],
+        'sailing_areas' => ['Baie de Piriac', 'Passage de Piriac'],
     ],
 ];
 
@@ -463,7 +491,7 @@ function generateTideProgressBar(array $today_data, array $port): string {
     $html .= '<div class="tide-progress-bar" style="width: ' . (($now_h - $port['range_low']) / ($port['range_high'] - $port['range_low']) * 100) . '%"></div>';
     $html .= '</div>';
     $html .= '<div class="tide-progress-info">';
-    $html .= '<span><span class="arrow">' . ($now_h > $prev_h ? '↑' : '↓') . '</span> ' . number_format($now_h, 2) . ' m</span>';
+    $html .= '<span><span class="arrow">' . ($now_h > ($port['range_low'] + $port['range_high'])/2 ? '↑' : '↓') . '</span> ' . number_format($now_h, 2) . ' m</span>';
     $html .= '<span>' . number_format($port['range_low'], 2) . ' m</span>';
     $html .= '<span>' . number_format($port['range_high'], 2) . ' m</span>';
     $html .= '</div>';
@@ -560,6 +588,136 @@ function generateNavigationBadge(array $today_data): string {
 }
 
 $navigationBadge = generateNavigationBadge($today_data);
+
+// ── Fonction pour générer les badges d'activité marine ────────────────────────
+function generateMarineActivityBadges(array $port, array $today_data): string {
+    $html = '<div class="marine-activity-badges">';
+
+    // Badge pêche
+    $fishing_spots = $port['fishing_spots'] ?? [];
+    if (!empty($fishing_spots)) {
+        $html .= '<div class="marine-badge fishing-badge">';
+        $html .= '<div class="marine-badge-icon">🎣</div>';
+        $html .= '<div class="marine-badge-content">';
+        $html .= '<div class="marine-badge-title">Spots de pêche recommandés</div>';
+        $html .= '<div class="marine-badge-spots">' . esc(implode(', ', $fishing_spots)) . '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+    }
+
+    // Badge surf
+    $surf_spots = $port['surf_spots'] ?? [];
+    if (!empty($surf_spots)) {
+        $html .= '<div class="marine-badge surfing-badge">';
+        $html .= '<div class="marine-badge-icon">🏄</div>';
+        $html .= '<div class="marine-badge-content">';
+        $html .= '<div class="marine-badge-title">Spots de surf recommandés</div>';
+        $html .= '<div class="marine-badge-spots">' . esc(implode(', ', $surf_spots)) . '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+    }
+
+    // Badge navigation
+    $sailing_areas = $port['sailing_areas'] ?? [];
+    if (!empty($sailing_areas)) {
+        $html .= '<div class="marine-badge navigation-badge">';
+        $html .= '<div class="marine-badge-icon">⛵</div>';
+        $html .= '<div class="marine-badge-content">';
+        $html .= '<div class="marine-badge-title">Zones de navigation recommandées</div>';
+        $html .= '<div class="marine-badge-spots">' . esc(implode(', ', $sailing_areas)) . '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+    }
+
+    $html .= '</div>';
+    return $html;
+}
+
+$marineBadges = generateMarineActivityBadges($port, $today_data);
+
+// ── Fonction pour générer les conseils de sécurité ────────────────────────────
+function generateSafetyTips(array $port): string {
+    $tips = [
+        "Vérifiez toujours la météo avant de partir en mer",
+        "Respectez les horaires de marée pour naviguer en sécurité",
+        "Équipement de sécurité obligatoire : gilet de sauvetage, VHF, balise de détresse",
+        "Ne partez pas seul en mer, surtout par mauvais temps",
+        "Restez informé des conditions locales et des alertes maritimes",
+        "Vérifiez votre niveau de carburant avant de prendre la mer",
+        "Connaissez les courants locaux et les particularités du port",
+        "Respectez les zones de navigation interdites ou réglementées"
+    ];
+
+    $html = '<div class="safety-tips-card glass-card">';
+    $html .= '<div class="card-header">⚠️ Conseils de sécurité maritime</div>';
+    $html .= '<div class="card-body">';
+    $html .= '<div class="safety-tips-list">';
+
+    foreach ($tips as $tip) {
+        $html .= '<div class="safety-tip-item">';
+        $html .= '<span class="safety-tip-icon">🔶</span>';
+        $html .= '<span class="safety-tip-text">' . esc($tip) . '</span>';
+        $html .= '</div>';
+    }
+
+    $html .= '</div>';
+    $html .= '</div>';
+    $html .= '</div>';
+
+    return $html;
+}
+
+$safetyTips = generateSafetyTips($port);
+
+// ── Fonction pour générer les alertes météo ───────────────────────────────────
+function generateWeatherAlerts(): string {
+    $alerts = [
+        [
+            'level' => 'warning',
+            'title' => 'Vent fort attendu',
+            'message' => 'Des vents de 30 à 40 nœuds sont prévus demain après-midi sur la côte atlantique.',
+            'time' => 'Demain 14:00 - 18:00'
+        ],
+        [
+            'level' => 'info',
+            'title' => 'Marées vives',
+            'message' => 'Coefficient de marée élevé (110) prévu pour demain. Soyez prudent près des côtes.',
+            'time' => 'Demain toute la journée'
+        ],
+        [
+            'level' => 'warning',
+            'title' => 'Brouillard matinal',
+            'message' => 'Visibilité réduite prévue demain matin entre 6h et 9h.',
+            'time' => 'Demain 6:00 - 9:00'
+        ]
+    ];
+
+    $html = '<div class="weather-alerts-card glass-card">';
+    $html .= '<div class="card-header">🌦️ Alertes météo et maritimes</div>';
+    $html .= '<div class="card-body">';
+
+    if (empty($alerts)) {
+        $html .= '<div class="no-alerts">Aucune alerte active pour le moment</div>';
+    } else {
+        foreach ($alerts as $alert) {
+            $html .= '<div class="weather-alert-item ' . esc($alert['level']) . '">';
+            $html .= '<div class="weather-alert-header">';
+            $html .= '<span class="weather-alert-icon">' . ($alert['level'] === 'warning' ? '⚠️' : ($alert['level'] === 'info' ? 'ℹ️' : '🔵')) . '</span>';
+            $html .= '<span class="weather-alert-title">' . esc($alert['title']) . '</span>';
+            $html .= '<span class="weather-alert-time">' . esc($alert['time']) . '</span>';
+            $html .= '</div>';
+            $html .= '<div class="weather-alert-message">' . esc($alert['message']) . '</div>';
+            $html .= '</div>';
+        }
+    }
+
+    $html .= '</div>';
+    $html .= '</div>';
+
+    return $html;
+}
+
+$weatherAlerts = generateWeatherAlerts();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -1283,787 +1441,3 @@ svg {
   .graph-30days {
     background: var(--surface2);
     border-radius: var(--r);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  .graph-30days-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .graph-30days-title {
-    font-size: .82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--muted);
-  }
-  .graph-30days-subtitle {
-    font-size: .75rem;
-    color: var(--muted);
-    margin-top: .2rem;
-  }
-  .graph-30days-container {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: .5rem;
-  }
-  .graph-30days-svg {
-    min-width: 320px;
-    width: 100%;
-    height: 140px;
-  }
-
-  /* ── Section "Bon à savoir" ── */
-  .know-card {
-    background: var(--surface2);
-    border-radius: var(--r);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  .know-card-header {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--cyan);
-    margin-bottom: 1rem;
-    position: relative;
-    padding-bottom: .5rem;
-  }
-  .know-card-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 40px;
-    height: 2px;
-    background: var(--cyan);
-  }
-  .know-content {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-  }
-  .know-image {
-    flex: 1;
-    min-width: 200px;
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  .know-image img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.5s ease;
-  }
-  .know-image:hover img {
-    transform: scale(1.05);
-  }
-  .know-text {
-    flex: 2;
-    font-size: .95rem;
-    line-height: 1.6;
-  }
-  .know-text p {
-    margin-bottom: 1rem;
-  }
-  .know-text strong {
-    color: var(--cyan);
-    font-weight: 600;
-  }
-  .know-fact {
-    background: rgba(6, 182, 212, 0.1);
-    border-left: 3px solid var(--cyan);
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 0 var(--r) var(--r) 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  /* ── API Status ── */
-  .api-status {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    padding: .3rem .6rem;
-    border-radius: 6px;
-    font-size: .7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    z-index: 100;
-  }
-  .api-status.success {
-    color: var(--green);
-    border-color: rgba(16, 185, 129, 0.3);
-  }
-  .api-status.error {
-    color: var(--red);
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-  .api-status.warning {
-    color: var(--amber);
-    border-color: rgba(245, 158, 11, 0.3);
-  }
-
-  /* ── Carte interactive ── */
-  .map-card {
-    background: var(--surface2);
-    border-radius: var(--r);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  .map-card-header {
-    font-size: .82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--muted);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-  }
-  .interactive-map {
-    width: 100%;
-    height: auto;
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  .port-marker {
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-  .port-marker:hover {
-    r: 10;
-    stroke-width: 3;
-  }
-  .port-marker.active {
-    r: 10;
-    stroke-width: 3;
-    fill: var(--cyan);
-  }
-  .port-label {
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .port-marker:hover + .port-label,
-  .port-marker.active + .port-label {
-    opacity: 1;
-  }
-
-  /* ── Badge "Meilleur moment pour pêcher" ── */
-  .fishing-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(245, 158, 11, 0.1);
-    border-left: 3px solid var(--amber);
-    padding: 1rem;
-    border-radius: 0 var(--r) var(--r) 0;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  .fishing-badge-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
-  }
-  .fishing-badge-content {
-    flex: 1;
-  }
-  .fishing-badge-title {
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--amber);
-    margin-bottom: .3rem;
-  }
-  .fishing-badge-time {
-    font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-    color: var(--text);
-    margin-bottom: .2rem;
-  }
-  .fishing-badge-info {
-    font-size: .8rem;
-    color: var(--muted);
-  }
-
-  /* ── Badge "Meilleur moment pour surfer" ── */
-  .surfing-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(6, 182, 212, 0.1);
-    border-left: 3px solid var(--cyan);
-    padding: 1rem;
-    border-radius: 0 var(--r) var(--r) 0;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  .surfing-badge-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
-  }
-  .surfing-badge-content {
-    flex: 1;
-  }
-  .surfing-badge-title {
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--cyan);
-    margin-bottom: .3rem;
-  }
-  .surfing-badge-time {
-    font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-    color: var(--text);
-    margin-bottom: .2rem;
-  }
-  .surfing-badge-info {
-    font-size: .8rem;
-    color: var(--muted);
-  }
-
-  /* ── Badge "Meilleur moment pour naviguer" ── */
-  .navigation-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(29, 78, 216, 0.1);
-    border-left: 3px solid var(--blue);
-    padding: 1rem;
-    border-radius: 0 var(--r) var(--r) 0;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  .navigation-badge-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
-  }
-  .navigation-badge-content {
-    flex: 1;
-  }
-  .navigation-badge-title {
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--blue);
-    margin-bottom: .3rem;
-  }
-  .navigation-badge-time {
-    font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-    color: var(--text);
-    margin-bottom: .2rem;
-  }
-  .navigation-badge-info {
-    font-size: .8rem;
-    color: var(--muted);
-  }
-
-  /* ── Footer ── */
-  footer {
-    text-align: center;
-    padding: 2rem;
-    font-size: .75rem;
-    color: var(--muted);
-    border-top: 1px solid var(--border);
-    margin-top: 2rem;
-    position: relative;
-  }
-  footer strong {
-    color: var(--cyan);
-    font-weight: 600;
-  }
-  footer a {
-    color: var(--cyan);
-    text-decoration: none;
-    transition: color .2s ease;
-  }
-  footer a:hover {
-    color: #06b
-text-decoration: underline;
-  }
-  footer::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  }
-
-  /* ── Responsive ── */
-  @media (max-width: 700px) {
-    .top-grid { grid-template-columns: 1fr; }
-    .hero-port { font-size: 2.2rem; }
-    .main { padding: 1rem; }
-    .hero { padding: 1.5rem 1rem 0; }
-    .port-nav-inner { padding: 0 1rem; }
-    .coeff-number { font-size: 3.5rem; }
-    .tide-time { font-size: 1.3rem; }
-    .hero-time { font-size: 1.5rem; }
-    .know-content { flex-direction: column; }
-    .know-image { min-width: 100%; }
-  }
-
-  /* Animations supplémentaires */
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
-  }
-  .float-animation {
-    animation: float 3s ease-in-out infinite;
-  }
-</style>
-</head>
-<body>
-
-<!-- ── HERO ──────────────────────────────────────────────────────────────────── -->
-<header class="hero">
-  <div class="hero-content">
-    <div class="hero-top">
-      <div>
-        <div class="site-brand"><?= SITE_NAME ?> · v<?= VERSION ?></div>
-        <h1 class="hero-port float-animation"><?= esc($port['icon']) ?> <?= esc($port['name']) ?></h1>
-        <p class="hero-region"><?= esc($port['region']) ?> — <?= esc($port['desc']) ?></p>
-      </div>
-      <div class="hero-date">
-        <div class="hero-time" id="live-time"><?= date('H:i:s') ?></div>
-        <div><?= esc($date_label) ?></div>
-      </div>
-    </div>
-  </div>
-  <!-- Vagues animées améliorées -->
-  <div class="waves-wrap">
-    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path class="wave-path" d="M0,60 C150,100 300,20 450,60 C600,100 750,20 900,60 C1050,100 1200,20 1350,60 C1500,100 1650,20 1800,60 C1950,100 2100,20 2250,60 C2400,100 2550,20 2700,60 C2850,100 2880,60 2880,60 L0,60 Z" />
-      <path class="wave-path" d="M0,50 C200,90 400,10 600,50 C800,90 1000,10 1200,50 C1400,90 1600,10 1800,50 C2000,90 2200,10 2400,50 C2600,90 2800,50 2880,50 L0,50 Z" style="animation-delay: -2s" />
-      <path class="wave-path" d="M0,40 C250,80 500,0 750,40 C1000,80 1250,0 1500,40 C1750,80 2000,0 2250,40 C2500,80 2750,40 2880,40 L0,40 Z" style="animation-delay: -4s" />
-    </svg>
-  </div>
-</header>
-
-<!-- ── NAVIGATION PORTS ───────────────────────────────────────────────────────── -->
-<nav class="port-nav">
-  <div class="port-nav-inner">
-    <?php foreach ($PORTS as $k => $p): ?>
-    <a href="?port=<?= esc($k) ?>" class="port-btn <?= $k === $port_key ? 'active' : '' ?>">
-      <?= $p['icon'] ?> <?= esc($p['name']) ?>
-    </a>
-    <?php endforeach; ?>
-  </div>
-</nav>
-
-<!-- ── CONTENU ───────────────────────────────────────────────────────────────── -->
-<main class="main">
-
-  <!-- Carte interactive -->
-  <div class="card glass-card map-card">
-    <div class="map-card-header">🌊 Carte des ports de Loire-Atlantique</div>
-    <?= $interactiveMap ?>
-  </div>
-
-  <!-- Coefficient + Marées du jour -->
-  <div class="top-grid">
-    <!-- Coefficient -->
-    <div class="card glass-card">
-      <div class="card-header">📊 Coefficient de marée</div>
-      <div class="coeff-card coeff-<?= coeffClass($today_data['coeff']) ?>">
-        <div class="coeff-gauge-container">
-          <?= $coeffGauge ?>
-          <div class="coeff-gauge-info">
-            <span><span class="pip pip-morte"></span>Mortes</span>
-            <span><span class="pip pip-moyen"></span>Moyen</span>
-            <span><span class="pip pip-fort"></span>Fort</span>
-            <span><span class="pip pip-vive"></span>Vives</span>
-          </div>
-        </div>
-        <div class="coeff-number"><?= $today_data['coeff'] ?></div>
-        <div class="coeff-label"><?= coeffLabel($today_data['coeff']) ?></div>
-        <div class="coeff-title">Aujourd'hui</div>
-      </div>
-    </div>
-
-    <!-- Marées du jour -->
-    <div class="card glass-card">
-      <div class="card-header">🌊 Marées d'aujourd'hui</div>
-      <div class="card-body">
-        <div class="tides-grid">
-          <?php if (!empty($today_data['tides'])): ?>
-            <?php foreach ($today_data['tides'] as $t): ?>
-            <div class="tide-item tide-<?= $t['type'] ?>">
-              <div class="tide-badge"><?= $t['type'] === 'high' ? 'Pleine mer' : 'Basse mer' ?></div>
-              <div class="tide-time"><?= esc($t['time']) ?></div>
-              <div class="tide-height"><?= number_format($t['height'], 2) ?> m</div>
-            </div>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <div style="color:var(--muted);font-size:.85rem;grid-column:1/-1;text-align:center;padding:1rem;">
-              Aucune donnée de marée disponible pour aujourd'hui.
-            </div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Barre de progression de la marée actuelle -->
-  <div class="card glass-card">
-    <div class="card-header">🌊 Niveau de la mer maintenant</div>
-    <div class="card-body">
-      <?= generateTideProgressBar($today_data, $port) ?>
-    </div>
-  </div>
-
-  <!-- Badges d'activité -->
-  <div class="activity-badges">
-    <?= $fishingBadge ?>
-    <?= $surfingBadge ?>
-    <?= $navigationBadge ?>
-  </div>
-
-  <!-- Courbe de marée -->
-  <div class="card glass-card">
-    <div class="card-header">📈 Courbe de marée — Aujourd'hui</div>
-    <div class="card-body">
-      <div class="curve-wrap">
-        <svg class="curve-svg" viewBox="0 0 960 160" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#06b6d4" stop-opacity=".35"/>
-              <stop offset="100%" stop-color="#06b6d4" stop-opacity=".02"/>
-            </linearGradient>
-            <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#0891b2"/>
-              <stop offset="50%" stop-color="#06b6d4"/>
-              <stop offset="100%" stop-color="#0891b2"/>
-            </linearGradient>
-            <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="4" result="blur"/>
-              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-            </filter>
-          </defs>
-
-          <!-- Grille horizontale -->
-          <?php
-          $rng_svg = $port['range_high'] - $port['range_low'];
-          $steps = 4;
-          for ($s = 0; $s <= $steps; $s++):
-              $y_g = round(14 + $s / $steps * 132, 1);
-              $h_g = round($port['range_high'] - $s / $steps * $rng_svg, 1);
-          ?>
-          <line x1="0" y1="<?= $y_g ?>" x2="960" y2="<?= $y_g ?>" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-          <text x="4" y="<?= $y_g - 3 ?>" font-size="9" fill="rgba(107,140,170,.7)" font-family="var(--mono)"><?= $h_g ?>m</text>
-          <?php endfor; ?>
-
-          <!-- Lignes verticales (heures) -->
-          <?php for ($hr = 0; $hr <= 24; $hr += 3): ?>
-          <line x1="<?= round($hr / 24 * 960) ?>" y1="0" x2="<?= round($hr / 24 * 960) ?>" y2="160"
-                stroke="rgba(255,255,255,.04)" stroke-width="1"/>
-          <?php endfor; ?>
-
-          <!-- Aire sous la courbe -->
-          <path d="<?= $svg_path ?> L960,160 L0,160 Z" fill="url(#curveGrad)"/>
-
-          <!-- Ligne de la courbe -->
-          <path class="curve-path" d="<?= $svg_path ?>" fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round"/>
-
-          <!-- Points des marées -->
-          <?php foreach ($today_data['tides'] as $i => $t):
-              $tx = round(($t['ts'] - $today_ts) / 86400 * 960, 1);
-              $ty = round(14 + (1 - ($t['height'] - $port['range_low']) / $rng_svg) * 132, 1);
-              $is_high = $t['type'] === 'high';
-          ?>
-          <g class="tide-point" style="animation-delay: <?= $i * 0.2 ?>s">
-            <circle cx="<?= $tx ?>" cy="<?= $ty ?>" r="5" fill="<?= $is_high ? '#06b6d4' : '#f59e0b' ?>" stroke="var(--bg)" stroke-width="2"/>
-            <text x="<?= $tx ?>" y="<?= $is_high ? $ty - 9 : $ty + 16 ?>"
-                  font-size="9" fill="<?= $is_high ? '#06b6d4' : '#f59e0b' ?>"
-                  text-anchor="middle" font-family="var(--mono)"><?= $t['time'] ?></text>
-          </g>
-          <?php endforeach; ?>
-
-          <!-- Curseur "maintenant" -->
-          <?php if ($now_frac > 0 && $now_frac < 1): ?>
-          <g class="now-cursor">
-            <line x1="<?= $now_x ?>" y1="0" x2="<?= $now_x ?>" y2="160"
-                  stroke="#ffffff" stroke-width="1" stroke-dasharray="3,3" opacity=".4"/>
-            <circle cx="<?= $now_x ?>" cy="<?= $now_y ?>" r="6" fill="#ffffff" opacity=".9"/>
-            <circle cx="<?= $now_x ?>" cy="<?= $now_y ?>" r="3" fill="var(--cyan)"/>
-          </g>
-          <text class="now-text" x="<?= $now_x + 8 ?>" y="<?= $now_y - 6 ?>"
-                font-size="9" fill="rgba(255,255,255,.7)" font-family="var(--mono)">maintenant</text>
-          <?php endif; ?>
-        </svg>
-
-        <!-- Labels des heures -->
-        <div class="axis-hours">
-          <?php for ($hr = 0; $hr <= 24; $hr += 3): ?>
-          <span><?= $hr ?>h</span>
-          <?php endfor; ?>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Graphique 30 jours -->
-  <div class="card glass-card graph-30days">
-    <div class="graph-30days-header">
-      <div>
-        <div class="graph-30days-title">📊 Évolution du coefficient sur 30 jours</div>
-        <div class="graph-30days-subtitle">Prévisions des coefficients de marée</div>
-      </div>
-    </div>
-    <div class="graph-30days-container">
-      <?= $graph30Days ?>
-    </div>
-  </div>
-
-  <!-- Section "Bon à savoir" -->
-  <div class="card glass-card know-card">
-    <div class="know-card-header">🌊 Bon à savoir sur les marées</div>
-    <div class="know-content">
-      <div class="know-image">
-        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80" alt="Marée en Loire-Atlantique">
-      </div>
-      <div class="know-text">
-        <p><strong>Le coefficient de marée</strong> est un indicateur qui mesure l'intensité des marées. Il varie entre 0 et 120, où 120 correspond à des marées particulièrement fortes.</p>
-
-        <div class="know-fact">
-          <p>Les marées sont principalement causées par la gravité combinée de la Lune et du Soleil, ainsi que par les forces centrifuges générées par la rotation de la Terre.</p>
-        </div>
-
-        <p>Lorsqu'un coefficient est élevé (supérieur à 70), on parle de <strong>marées vives</strong>. Ces marées peuvent causer des inondations côtières, surtout lors des tempêtes.</p>
-
-        <div class="know-fact">
-          <p>Le coefficient de marée suit un cycle lunaire d'environ 29,5 jours, correspondant aux phases de la Lune. Les pleines lunes et les nouvelles lunes correspondent généralement aux coefficients les plus élevés.</p>
-        </div>
-
-        <p>Les marées sont mesurées en mètres par rapport au niveau moyen de la mer. La hauteur de la mer varie tout au long de la journée en fonction des marées.</p>
-
-        <div class="know-fact">
-          <p>Les ports comme <?= esc($port['name']) ?>, situé en <?= esc($port['region']) ?>, ont des caractéristiques spécifiques de marées en raison de leur emplacement géographique et de la configuration du fond marin.</p>
-        </div>
-
-        <p>Pour naviguer en sécurité dans les zones côtières, il est important de connaître les horaires et les hauteurs des marées, surtout lors des périodes de fortes marées.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 7 jours -->
-  <div class="card glass-card">
-    <div class="card-header">📅 Prévisions — 7 jours</div>
-    <table class="days-table">
-      <?php foreach ($days as $i => $day): ?>
-      <tr>
-        <td class="td-day"><?= esc($day['label']) ?></td>
-        <td class="td-coeff">
-          <div class="coeff-pip">
-            <span class="pip pip-<?= coeffClass($day['coeff']) ?>"></span>
-            <span style="color:var(--text)"><?= $day['coeff'] ?></span>
-          </div>
-        </td>
-        <td>
-          <div class="td-tides">
-            <?php if (!empty($day['tides'])): ?>
-              <?php foreach ($day['tides'] as $t): ?>
-              <div class="mini-tide <?= $t['type'] ?>">
-                <span class="mini-tide-type"><?= $t['type'] === 'high' ? 'PM' : 'BM' ?></span>
-                <span class="mini-tide-time"><?= esc($t['time']) ?></span>
-                <span class="mini-tide-h"><?= number_format($t['height'], 1) ?>m</span>
-              </div>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <div style="color:var(--muted);font-size:.75rem;">Aucune donnée</div>
-            <?php endif; ?>
-          </div>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-    </table>
-  </div>
-
-</main>
-
-<!-- Statut API -->
-<div class="api-status <?= isset($apiData['status']) && $apiData['status'] === 'error' ? 'error' : 'success' ?>">
-  <?= isset($apiData['status']) && $apiData['status'] === 'error' ? 'Données simulées' : 'Données API' ?>
-</div>
-
-<footer>
-  <strong><?= SITE_NAME ?></strong> v<?= VERSION ?> — Données marées pour <?= esc($port['name']) ?><br>
-  <?php if (isset($apiData['status']) && $apiData['status'] === 'error'): ?>
-    Mode démonstration (données simulées). <a href="https://www.worldtides.info/developer" target="_blank">Obtenez une clé API</a> pour des données réelles.
-  <?php else: ?>
-    Données fournies par <a href="https://www.worldtides.info" target="_blank">WorldTides</a>
-  <?php endif; ?><br>
-  Généré le <?= date('d/m/Y à H:i:s') ?>
-</footer>
-
-<script>
-// Horloge en temps réel
-function tick() {
-  const d = new Date();
-  const h = String(d.getHours()).padStart(2,'0');
-  const m = String(d.getMinutes()).padStart(2,'0');
-  const s = String(d.getSeconds()).padStart(2,'0');
-  const el = document.getElementById('live-time');
-  if (el) el.textContent = h + ':' + m + ':' + s;
-}
-setInterval(tick, 1000);
-tick();
-
-// Animation des vagues
-document.addEventListener('DOMContentLoaded', function() {
-  const waves = document.querySelectorAll('.wave-path');
-  waves.forEach((wave, index) => {
-    wave.style.animationDelay = `-${index * 2}s`;
-  });
-
-  // Animation de la barre de progression de la marée
-  const tideProgressBar = document.querySelector('.tide-progress-bar');
-  if (tideProgressBar) {
-    const width = tideProgressBar.style.width;
-    tideProgressBar.style.width = '0%';
-    setTimeout(() => {
-      tideProgressBar.style.width = width;
-    }, 100);
-  }
-});
-
-// Animation des cartes au survol
-const cards = document.querySelectorAll('.card');
-cards.forEach(card => {
-  card.addEventListener('mouseenter', function() {
-    this.style.transform = 'translateY(-5px)';
-  });
-  card.addEventListener('mouseleave', function() {
-    this.style.transform = 'translateY(0)';
-  });
-});
-
-// Animation de la jauge du coefficient
-function animateGauge() {
-  const gauge = document.querySelector('.coeff-gauge');
-  if (!gauge) return;
-
-  const path = gauge.querySelector('path[d^="M50,50"]');
-  if (!path) return;
-
-  const length = path.getTotalLength();
-  path.style.strokeDasharray = length;
-  path.style.strokeDashoffset = length;
-
-  let start = null;
-  const duration = 2000;
-
-  function step(timestamp) {
-    if (!start) start = timestamp;
-    const progress = timestamp - start;
-    const percent = Math.min(progress / duration, 1);
-
-    path.style.strokeDashoffset = length * (1 - percent);
-
-    if (percent < 1) {
-      window.requestAnimationFrame(step);
-    }
-  }
-
-  window.requestAnimationFrame(step);
-}
-
-// Animation de la courbe de marée
-function animateTideCurve() {
-  const curvePath = document.querySelector('.curve-path');
-  if (!curvePath) return;
-
-  const length = curvePath.getTotalLength();
-  curvePath.style.strokeDasharray = length;
-  curvePath.style.strokeDashoffset = length;
-
-  let start = null;
-  const duration = 2000;
-
-  function step(timestamp) {
-    if (!start) start = timestamp;
-    const progress = timestamp - start;
-    const percent = Math.min(progress / duration, 1);
-
-    curvePath.style.strokeDashoffset = length * (1 - percent);
-
-    if (percent < 1) {
-      window.requestAnimationFrame(step);
-    }
-  }
-
-  window.requestAnimationFrame(step);
-}
-
-// Animation des points de marée
-function animateTidePoints() {
-  const points = document.querySelectorAll('.tide-point');
-  points.forEach((point, index) => {
-    point.style.animationDelay = `${index * 0.2}s`;
-  });
-}
-
-// Animation de la carte interactive
-function animateInteractiveMap() {
-  const markers = document.querySelectorAll('.port-marker');
-  markers.forEach((marker, index) => {
-    marker.addEventListener('mouseenter', function() {
-      const label = this.nextElementSibling;
-      if (label && label.classList.contains('port-label')) {
-        label.style.opacity = '1';
-      }
-    });
-
-    marker.addEventListener('mouseleave', function() {
-      if (!this.classList.contains('active')) {
-        const label = this.nextElementSibling;
-        if (label && label.classList.contains('port-label')) {
-          label.style.opacity = '0';
-        }
-      }
-    });
-  });
-}
-
-// Animation des badges d'activité
-function animateActivityBadges() {
-  const badges = document.querySelectorAll('.fishing-badge, .surfing-badge, .navigation-badge');
-  badges.forEach((badge, index) => {
-    badge.style.animationDelay = `${index * 0.3}s`;
-  });
-}
-
-// Appeler les animations après le chargement du DOM
-document.addEventListener('DOMContentLoaded', function() {
-  animateGauge();
-  animateTideCurve();
-  animateTidePoints();
-  animateInteractiveMap();
-  animateActivityBadges();
-});
-</script>
-</body>
-</html>
