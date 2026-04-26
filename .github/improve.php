@@ -6,11 +6,25 @@
 
 $api_key = getenv('MISTRAL_API_KEY');
 $file    = __DIR__ . '/../index.php';
-$goal    = 'Améliore le design et les fonctionnalités du site de marées en Loire-Atlantique. '
-         . 'Rends-le plus beau, plus professionnel et plus utile. '
-         . 'Ajoute des fonctionnalités pertinentes pour les marins, pêcheurs et touristes. '
-         . 'Conserve toutes les fonctionnalités existantes. '
-         . 'Incrémente le numéro de VERSION.';
+$goal    = implode(' ', [
+    'Tu améliores un site de marées pour la Loire-Atlantique (44).',
+    'CHAQUE NUIT tu dois ajouter ou améliorer UNE chose concrète parmi cette liste tournante :',
+    '- Ajouter un port manquant de Loire-Atlantique (La Baule, Pornichet, Le Croisic, Piriac, Saint-Brévin, Noirmoutier, L\'Herbaudière, Bouin, Beauvoir-sur-Mer, Saint-Jean-de-Monts)',
+    '- Améliorer le calcul des coefficients (utilise la formule SHOM officielle avec la lune)',
+    '- Ajouter une section "Pêche à pied" avec les créneaux idéaux (2h avant/après basse mer, coeff > 70)',
+    '- Améliorer le design CSS : dégradés marins, animations vagues, responsive mobile parfait',
+    '- Ajouter météo marine : force du vent, état de la mer (via wttr.in JSON pour les coords du port)',
+    '- Ajouter un calendrier mensuel compact avec les grandes marées (coeff > 100)',
+    '- Ajouter une section "Surf & Kite" avec conditions idéales par port',
+    '- Optimiser la lisibilité : meilleure typographie, icônes SVG pour les marées montante/descendante',
+    '- Ajouter un sélecteur de port avec mémorisation via localStorage',
+    'RÈGLES STRICTES :',
+    '1. Fichier PHP unique auto-suffisant, AUCUNE dépendance externe sauf wttr.in si météo.',
+    '2. Conserve TOUTES les fonctionnalités existantes sans rien casser.',
+    '3. Le code PHP doit être complet du début à la fin, jamais tronqué.',
+    '4. Incrémente le numéro de VERSION dans le define().',
+    '5. Choisis toi-même quelle amélioration apporter en fonction de ce qui manque le plus.',
+]);
 
 // Modèle et timeout adaptés à la taille du fichier
 $model   = 'mistral-small-latest'; // Plus rapide pour les gros fichiers
