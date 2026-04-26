@@ -2,10 +2,10 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.2.0 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.3.0 — Design professionnel avec animations immersives et visualisations améliorées
  */
 
-define('VERSION',   '3.2.0');
+define('VERSION',   '3.3.0');
 define('SITE_NAME', 'MaréesLive');
 define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
 
@@ -719,8 +719,8 @@ body {
   animation: wavePath 8s ease-in-out infinite alternate;
 }
 @keyframes wavePath {
-  0% { stroke-dasharray: 0
-100% { stroke-dasharray: 100% 0; opacity: 0.8; }
+  0% { stroke-dasharray: 0 100%; opacity: 0.5; }
+  100% { stroke-dasharray: 100% 0; opacity: 0.8; }
 }
 
 /* ── Sélecteur de ports ── */
@@ -1603,10 +1603,10 @@ svg {
   footer::before {
     content: '';
     position: absolute;
-    top: -1px;
+   
+top: -1px;
     left: 0;
-
-width: 100%;
+    width: 100%;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--cyan), transparent);
   }
