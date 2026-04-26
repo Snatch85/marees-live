@@ -2,10 +2,10 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.3.0 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.4.0 — Design professionnel avec animations immersives et visualisations améliorées
  */
 
-define('VERSION',   '3.3.0');
+define('VERSION',   '3.4.0');
 define('SITE_NAME', 'MaréesLive');
 define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
 
@@ -656,7 +656,13 @@ function generateCyclingBadge(array $today_data): string {
 
     foreach ($today_data['tides'] as $tide) {
         if
-if ($best_tide === null) {
+if ($tide['type'] === 'low' && ($best_tide === null || $tide['height'] < $best_tide['height'])) {
+            $best_tide = $tide;
+            $best_time = $tide['time'];
+        }
+    }
+
+    if ($best_tide === null) {
         return '<div class="cycling-badge">Aucune donnée disponible</div>';
     }
 
@@ -1384,11 +1390,19 @@ function generateSeaKayakingBadge(array $today_data): string {
     $html .= '<div class="sea-kayaking-badge-icon">🛶</div>';
     $html .= '<div class="sea-kayaking-badge-content">';
     $html .= '<div class="sea-kayaking-badge-title">Meilleur moment pour faire du kayak de mer</div>';
+    $html .= '<div class="sea-k
+if ($best_tide === null) {
+        return '<div class="sea-kayaking-badge">Aucune donnée disponible</div>';
+    }
+
+    $html = '<div class="sea-kayaking-badge">';
+    $html .= '<div class="sea-kayaking-badge-icon">🛶</div>';
+    $html .= '<div class="sea-kayaking-badge-content">';
+    $html .= '<div class="sea-kayaking-badge-title">Meilleur moment pour faire du kayak de mer</div>';
     $html .= '<div class="sea-kayaking-badge-time">' . esc($best_time) . '</div>';
     $html .= '<div class="sea-kayaking-badge-info">Basse mer à ' . number_format($best_tide['height'], 2) . ' m</div>';
-    $html .= '</div
-$html .= '</div>';
     $html .= '</div>';
+    $html .= '</div>';
 
     return $html;
 }
@@ -2098,6 +2112,8 @@ function generateSeaKayakingBadge(array $today_data): string {
     }
 
     if ($best_tide === null) {
+        return '<div class="sea-kayaking-badge">Aucune donnée disponible</div
+if ($best_tide === null) {
         return '<div class="sea-kayaking-badge">Aucune donnée disponible</div>';
     }
 
@@ -2113,8 +2129,7 @@ function generateSeaKayakingBadge(array $today_data): string {
     return $html;
 }
 
-$seaKayakingBadge = generateSeaKay
-akingBadge($today_data);
+$seaKayakingBadge = generateSeaKayakingBadge($today_data);
 
 // ── Fonction pour générer le badge "Meilleur moment pour faire du kayak de mer" ────────────
 function generateSeaKayakingBadge(array $today_data): string {
@@ -2819,6 +2834,8 @@ function generateSeaKayakingBadge(array $today_data): string {
     }
 
     if ($best_tide === null) {
+        return '<div class="sea-kayaking-badge">Aucune donnée disponible</div
+if ($best_tide === null) {
         return '<div class="sea-kayaking-badge">Aucune donnée disponible</div>';
     }
 
@@ -2835,9 +2852,6 @@ function generateSeaKayakingBadge(array $today_data): string {
 }
 
 $seaKayakingBadge = generateSeaKayakingBadge($today_data);
-
-// ── Fonction pour générer le badge "Meilleur moment pour faire du kayak de mer" ────
-akingBadge($today_data);
 
 // ── Fonction pour générer le badge "Meilleur moment pour faire du kayak de mer" ────────────
 function generateSeaKayakingBadge(array $today_data): string {
@@ -3542,6 +3556,8 @@ function generateSeaKayakingBadge(array $today_data): string {
     }
 
     if ($best_tide === null) {
+        return '<div class="sea-kayaking-badge">Aucune donnée disponible</div
+if ($best_tide === null) {
         return '<div class="sea-kayaking-badge">Aucune donnée disponible</div>';
     }
 
@@ -3559,9 +3575,6 @@ function generateSeaKayakingBadge(array $today_data): string {
 
 $seaKayakingBadge = generateSeaKayakingBadge($today_data);
 
-// ── Fonction pour générer le badge "Meilleur moment pour faire du kayak de mer" ────
-akingBadge($today_data);
-
 // ── Fonction pour générer le badge "Meilleur moment pour faire du kayak de mer" ────────────
 function generateSeaKayakingBadge(array $today_data): string {
     $best_tide = null;
@@ -4265,21 +4278,4 @@ function generateSeaKayakingBadge(array $today_data): string {
     }
 
     if ($best_tide === null) {
-        return '<div class="sea-kayaking-badge">Aucune donnée disponible</div>';
-    }
-
-    $html = '<div class="sea-kayaking-badge">';
-    $html .= '<div class="sea-kayaking-badge-icon">🛶</div>';
-    $html .= '<div class="sea-kayaking-badge-content">';
-    $html .= '<div class="sea-kayaking-badge-title">Meilleur moment pour faire du kayak de mer</div>';
-    $html .= '<div class="sea-kayaking-badge-time">' . esc($best_time) . '</div>';
-    $html .= '<div class="sea-kayaking-badge-info">Basse mer à ' . number_format($best_tide['height'], 2) . ' m</div>';
-    $html .= '</div>';
-    $html .= '</div>';
-
-    return $html;
-}
-
-$seaKayakingBadge = generateSeaKayakingBadge($today_data);
-
-// ── Fonction pour générer le badge "Meilleur moment pour faire du kayak de mer" ────
+        return '<div class="sea-kayaking-badge">Aucune donnée disponible</div
