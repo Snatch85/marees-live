@@ -1,0 +1,35 @@
+name: 🌊 AutoCode Marées
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # Chaque nuit à 3h du matin (heure UTC)
+  workflow_dispatch:        # Bouton pour lancer manuellement depuis GitHub
+
+jobs:
+  improve:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Télécharger le code
+        uses: actions/checkout@v4
+
+      - name: 🐘 Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: curl
+
+      - name: 🤖 Améliorer avec Mistral
+        env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: php .github/improve.php
+
+      - name: 💾 Sauvegarder sur GitHub
+        run: |
+          git config user.name "AutoCode Bot 🌊"
+          git config user.email "autocode@marees.bot"
+          git add index.php
+          git diff --staged --quiet || git commit -m "🌊 AutoCode: amélioration automatique $(date '+%Y-%m-%d')"
+          git push
