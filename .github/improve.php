@@ -109,6 +109,19 @@ if (!str_contains($improved, '<?php')) {
     exit(1);
 }
 
+// ── Vérification syntaxique avant d'écraser ──────────────────────────────────
+$tmp = tempnam(sys_get_temp_dir(), 'autocode_') . '.php';
+file_put_contents($tmp, $improved);
+exec("php -l " . escapeshellarg($tmp) . " 2>&1", $lint_out, $lint_code);
+unlink($tmp);
+
+if ($lint_code !== 0) {
+    echo "❌ Erreur de syntaxe PHP détectée — le fichier original est conservé\n";
+    echo implode("\n", $lint_out) . "\n";
+    exit(1);
+}
+echo "✅ Syntaxe PHP valide\n";
+
 // ── Écrire le fichier amélioré ────────────────────────────────────────────────
 file_put_contents($file, $improved);
 $new_lines = count(file($file));
