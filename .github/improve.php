@@ -12,6 +12,10 @@ $goal    = 'Améliore le design et les fonctionnalités du site de marées en Lo
          . 'Conserve toutes les fonctionnalités existantes. '
          . 'Incrémente le numéro de VERSION.';
 
+// Modèle et timeout adaptés à la taille du fichier
+$model   = 'mistral-small-latest'; // Plus rapide pour les gros fichiers
+$timeout = 300;                     // 5 minutes max
+
 // ── Vérifications ─────────────────────────────────────────────────────────────
 if (!$api_key) {
     echo "❌ MISTRAL_API_KEY non définie dans les secrets GitHub\n";
@@ -32,7 +36,7 @@ echo "📄 Fichier lu : " . number_format(strlen($source)) . " caractères, "
 echo "🤖 Envoi à Mistral Large...\n";
 
 $payload = [
-    'model'       => 'mistral-large-latest',
+    'model'       => $model,
     'temperature' => 0.2,
     'max_tokens'  => 16000,
     'messages'    => [
@@ -65,7 +69,7 @@ curl_setopt_array($ch, [
         'Authorization: Bearer ' . $api_key,
     ],
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT        => 180,
+    CURLOPT_TIMEOUT        => $timeout,
     CURLOPT_CONNECTTIMEOUT => 15,
 ]);
 
