@@ -2,10 +2,10 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.6.0 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.6.1 — Design professionnel avec animations immersives et visualisations améliorées
  */
 
-define('VERSION',   '3.6.0');
+define('VERSION',   '3.6.1');
 define('SITE_NAME', 'MaréesLive');
 define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
 
@@ -307,6 +307,7 @@ $svg_path = 'M ' . implode(' L ', $curve_pts);
 $now_frac = min(1.0, max(0.0, (time() - $today_ts) / 86400));
 $now_x = round($now_frac * 960, 1);
 $now_h = isset($apiData['heights']) ? $apiData['heights'][0]['height'] : tideAt(time(), $port);
+$prev_h = isset($apiData['heights']) ? $apiData['heights'][0]['height'] - 0.1 : tideAt(time() - 300, $port);
 $rng = $port['range_high'] - $port['range_low'];
 $now_y = round(160 - 14 - ($now_h - $port['range_low']) / $rng * 132, 1);
 
@@ -458,6 +459,7 @@ $interactiveMap = generateInteractiveMap($PORTS, $port_key);
 
 // ── Fonction pour générer la barre de progression de la marée ─────────────────
 function generateTideProgressBar(array $today_data, array $port): string {
+    global $now_h, $prev_h;
     $html = '<div class="tide-progress-container">';
     $html .= '<div class="tide-progress">';
     $html .= '<div class="tide-progress-bar" style="width: ' . (($now_h - $port['range_low']) / ($port['range_high'] - $port['range_low']) * 100) . '%"></div>';
@@ -572,24 +574,29 @@ $navigationBadge = generateNavigationBadge($today_data);
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:       #ffffff;
-  --surface:  #f8f9fa;
-  --surface2: #e9ecef;
-  --surface3: #dee2e6;
-  --border:   rgba(0,0,0,.07);
-  --text:     #212529;
-  --muted:    #6c757d;
-  --cyan:     #06b6d4;
-  --teal:     #0891b2;
-  --blue:     #1d4ed8;
-  --green:    #10b981;
-  --amber:    #f59e0b;
-  --red:      #ef4444;
-  --purple:   #8b5cf6;
-  --r:        14px;
-  --font:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --mono:     'JetBrains Mono', 'Fira Code', monospace;
-  --display:  'Playfair Display', serif;
+  --bg: #f0f9ff;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --surface3: #f1f5f9;
+  --border: rgba(0,0,0,.07);
+  --text: #1e293b;
+  --text-light: #64748b;
+  --muted: #94a3b8;
+  --cyan: #06b6d4;
+  --cyan-dark: #0891b2;
+  --blue: #3b82f6;
+  --blue-dark: #1d4ed8;
+  --green: #10b981;
+  --green-dark: #059669;
+  --amber: #f59e0b;
+  --amber-dark: #d97706;
+  --red: #ef4444;
+  --red-dark: #dc2626;
+  --purple: #8b5cf6;
+  --r: 16px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --display: 'Playfair Display', serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -601,18 +608,18 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   background-image:
-    radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 20%),
-    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 20%);
+    radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 20%);
 }
 
 /* ── Header immersif ── */
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #f8fafc 0%, #f0f9ff 100%);
   padding: 3rem 2rem 0;
   min-height: 300px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
   background-size: cover;
   background-position: center;
@@ -625,7 +632,9 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(248, 249, 250, 0.9) 0%, rgba(255, 255, 255, 0.9) 100%);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9)
+css
+  0%, rgba(240, 249, 255, 0.9) 100%);
   z-index: 1;
 }
 .hero-content {
@@ -638,58 +647,85 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  flex-wrap: wrap
-gap: 1rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 .site-brand {
-font-size: .78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
   color: var(--cyan);
-  margin-bottom: .4rem;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  gap: .5rem;
+  gap: 0.6rem;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.2);
 }
 .site-brand::before {
   content: "🌊";
   animation: wave 2s ease-in-out infinite;
 }
 @keyframes wave {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(5deg); }
+  75% { transform: translateY(-3px) rotate(-5deg); }
 }
 .hero-port {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
-  background: linear-gradient(135deg, #212529, var(--cyan));
+  background: linear-gradient(135deg, var(--text), var(--cyan-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-family: var(--display);
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.hero-port::after {
+  content: attr(data-icon);
+  position: absolute;
+  right: -1.5rem;
+  top: 0.2rem;
+  font-size: 2rem;
+  animation: float 3s ease-in-out infinite;
 }
 .hero-region {
   color: var(--muted);
-  font-size: 1.1rem;
-  margin-top: .25rem;
+  font-size: 1.2rem;
+  margin-top: 0.25rem;
   max-width: 600px;
+  font-weight: 500;
 }
 .hero-date {
   text-align: right;
-  font-size: .85rem;
+  font-size: 0.9rem;
   color: var(--muted);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 .hero-time {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 700;
   font-family: var(--mono);
-  color: var(--cyan);
-  text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
-  margin-bottom: .3rem;
+  color: var(--cyan-dark);
+  text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  margin-bottom: 0.3rem;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  display: inline-block;
 }
 
 /* Vagues animées améliorées */
@@ -698,14 +734,14 @@ font-size: .78rem;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 120px;
+  height: 150px;
   z-index: 1;
   overflow: hidden;
 }
 .waves-wrap svg {
   width: 200%;
   height: 100%;
-  animation: wave 12s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+  animation: wave 15s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
 }
 @keyframes wave {
   0% { transform: translateX(0); }
@@ -713,15 +749,23 @@ font-size: .78rem;
 }
 .wave-path {
   fill: none;
-  stroke: rgba(6, 182, 212, 0.2);
+  stroke: rgba(6, 182, 212, 0.15);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  animation: wavePath 8s ease-in-out infinite alternate;
+  animation: wavePath 10s ease-in-out infinite alternate;
 }
 @keyframes wavePath {
-  0% { stroke-dasharray: 0 100%; opacity: 0.5; }
-  100% { stroke-dasharray: 100% 0; opacity: 0.8; }
+  0% {
+    stroke-dasharray: 0 100%;
+    opacity: 0.3;
+    stroke: rgba(6, 182, 212, 0.1);
+  }
+  100% {
+    stroke-dasharray: 100% 0;
+    opacity: 0.6;
+    stroke: rgba(6, 182, 212, 0.25);
+  }
 }
 
 /* ── Sélecteur de ports ── */
@@ -729,10 +773,12 @@ font-size: .78rem;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   position: sticky;
   top: 0;
   z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .port-nav-inner {
   display: flex;
@@ -744,26 +790,28 @@ font-size: .78rem;
 .port-btn {
   display: flex;
   align-items: center;
-  gap: .45rem;
-  padding: .85rem 1.2rem;
-  font-size: .83rem;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--muted);
   text-decoration: none;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
-  transition: all .2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
 }
 .port-btn:hover {
   color: var(--text);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  background: rgba(6, 182, 212, 0.05);
 }
 .port-btn.active {
-  color: var(--cyan);
+  color: var(--cyan-dark);
   border-bottom-color: var(--cyan);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(6, 182, 212, 0.1);
+  transform: translateY(-2px);
+  background: rgba(6, 182, 212, 0.1);
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.1);
 }
 .port-btn::after {
   content: '';
@@ -773,7 +821,7 @@ font-size: .78rem;
   width: 0;
   height: 2px;
   background: var(--cyan);
-  transition: width .2s ease;
+  transition: width 0.3s ease;
 }
 .port-btn:hover::after, .port-btn.active::after {
   width: 100%;
@@ -784,24 +832,26 @@ font-size: .78rem;
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
 }
 
 /* ── Glassmorphism ── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0,0,0,.05);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--r);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
 }
 .glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
 }
 
 /* ── Cards ── */
@@ -810,36 +860,49 @@ font-size: .78rem;
   border: 1px solid var(--border);
   border-radius: var(--r);
   overflow: hidden;
-  transition: transform .2s ease, box-shadow .2s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
 }
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 .card-header {
-  padding: .9rem 1.4rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: .6rem;
-  font-size: .82rem;
+  gap: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .07em;
+  letter-spacing: 0.07em;
   color: var(--muted);
   background: var(--surface2);
+  position: relative;
 }
-.card-body { padding: 1.4rem; }
+.card-header::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  bottom: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--cyan);
+  border-radius: 1px;
+}
+.card-body {
+  padding: 1.5rem;
+}
 
 /* ── Grille du haut ── */
 .top-grid {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 1.5rem;
+  grid-template-columns: 240px 1fr;
+  gap: 2rem;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
   .top-grid {
     grid-template-columns: 1fr;
   }
@@ -851,98 +914,143 @@ font-size: .78rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: .4rem;
+  gap: 0.6rem;
   padding: 2rem 1rem;
   text-align: center;
   position: relative;
-  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+  border-radius: var(--r);
 }
 .coeff-number {
   font-size: 5rem;
   font-weight: 900;
   font-family: var(--mono);
   line-height: 1;
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
-  animation: pulse 2s infinite alternate;
+  text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  animation: pulse 2.5s infinite alternate;
 }
 @keyframes pulse {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.02); }
+  0% {
+    transform: scale(1);
+    text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  }
+  100% {
+    transform: scale(1.03);
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  }
 }
 .coeff-label {
-  font-size: .8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .1em;
-  padding: .3rem .9rem;
-  border-radius: 99px;
-  margin-top: .4rem;
-  background: rgba(6, 182, 212, 0.1);
-  color: var(--cyan);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.05);
+  letter-spacing: 0.1em;
+  padding: 0.4rem 1.2rem;
+  border-radius: 50px;
+  margin-top: 0.4rem;
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-dark);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.08);
+  transition: all 0.3s ease;
+}
+.coeff-label:hover {
+  background: rgba(6, 182, 212, 0.25);
+  transform: translateY(-1px);
 }
 .coeff-title {
-  font-size: .75rem;
+  font-size: 0.8rem;
   color: var(--muted);
-  margin-top: .2rem;
+  margin-top: 0.3rem;
   position: relative;
+  padding-bottom: 0.3rem;
 }
 .coeff-title::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 20px;
+  width: 24px;
   height: 2px;
   background: var(--cyan);
   border-radius: 1px;
 }
 
-.coeff-vive  .coeff-number { color: var(--red); background: linear-gradient(135deg, #ef4444, #dc2626); text-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
-.coeff-vive  .coeff-label  { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); box-shadow: 0 0 8px rgba(239, 68, 68, 0.05); }
-.coeff-fort  .coeff-number { color: var(--amber); background: linear-gradient(135deg, #f59e0b, #d97706); text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
-.coeff-fort  .coeff-label  { background: rgba(245, 158, 11, 0.1); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.2); box-shadow: 0 0 8px rgba(245, 158, 11, 0.05); }
-.coeff-moyen .coeff-number { color: var(--cyan); }
-.coeff-moyen .coeff-label  { background: rgba(6, 182, 212, 0.1); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.2); }
-.coeff-morte .coeff-number { color: var(--green); background: linear-gradient(135deg, #10b981, #059669); text-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
-.coeff-morte .coeff-label  { background: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.2); box-shadow: 0 0 8px rgba(16, 185, 129, 0.05); }
+.coeff-vive .coeff-number {
+  background: linear-gradient(135deg, var(--red), var(--red-dark));
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+}
+.coeff-vive .coeff-label {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--red-dark);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.08);
+}
+.coeff-fort .coeff-number {
+  background: linear-gradient(135deg, var(--amber), var(--amber-dark));
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+.coeff-fort .coeff-label {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--amber-dark);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.08);
+}
+.coeff-moyen .coeff-number {
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-dark));
+}
+.coeff-moyen .coeff-label {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-dark);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+.coeff-morte .coeff-number {
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+.coeff-morte .coeff-label {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--green-dark);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.08);
+}
 
 /* ── Jauge circulaire du coefficient ── */
 .coeff-gauge-container {
   width: 100%;
-  max-width: 200px;
+  max-width: 220px;
   margin: 0 auto;
   position: relative;
 }
 .coeff-gauge {
   width: 100%;
   height: auto;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  transform: rotate(-90deg);
 }
 .coeff-gauge-info {
   display: flex;
   justify-content: space-between;
-  font-size: .75rem;
+  font-size: 0.8rem;
   color: var(--muted);
-  margin-top: .5rem;
+  margin-top: 1rem;
 }
 .coeff-gauge-info span {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .2rem;
+  gap: 0.3rem;
 }
 .coeff-gauge-info .pip {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 .coeff-gauge-info .pip-vive { background: var(--red); }
 .coeff-gauge-info .pip-fort { background: var(--amber); }
@@ -952,22 +1060,24 @@ font-size: .78rem;
 /* ── Barre de progression de la marée ── */
 .tide-progress-container {
   width: 100%;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 }
 .tide-progress {
-  height: 20px;
+  height: 24px;
   background: rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .tide-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #06b6d4, #0891b2);
-  border-radius: 10px;
-  transition: width 0.5s ease;
+  background: linear-gradient(90deg, var(--cyan), var(--cyan-dark));
+  border-radius: 12px;
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
 }
 .tide-progress-bar::after {
   content: '';
@@ -976,47 +1086,50 @@ font-size: .78rem;
   right: 0;
   bottom: 0;
   width: 2px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
 }
 .tide-progress-info {
   display: flex;
   justify-content: space-between;
-  font-size: .75rem;
+  font-size: 0.8rem;
   color: var(--muted);
-  margin-top: .3rem;
+  margin-top: 0.4rem;
+  font-family: var(--mono);
 }
 .tide-progress-info span {
   display: flex;
   align-items: center;
-  gap: .3rem;
+  gap: 0.4rem;
 }
 .tide-progress-info .arrow {
-  font-size: .8rem;
+  font-size: 0.9rem;
   animation: pulse 1.5s infinite alternate;
+  color: var(--cyan);
 }
 
 /* ── Marées du jour ── */
 .tides-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.2rem;
   height: 100%;
   align-content: center;
 }
 .tide-item {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.1rem 1rem;
+  border-radius: 14px;
+  padding: 1.3rem 1rem;
   text-align: center;
   position: relative;
-  transition: all .2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 .tide-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   border-color: var(--cyan);
 }
 .tide-item::before {
@@ -1025,67 +1138,77 @@ font-size: .78rem;
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 4px;
   background: linear-gradient(90deg, transparent, var(--cyan), transparent);
   opacity: 0;
-  transition: opacity .2s ease;
+  transition: opacity 0.3s ease;
 }
 .tide-item:hover::before {
   opacity: 1;
 }
 .tide-badge {
-  font-size: .62rem;
+  font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: .1em;
-  padding: .2rem .6rem;
-  border-radius: 99px;
-  margin-bottom: .5rem;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  margin-bottom: 0.6rem;
   display: inline-block;
   background: rgba(6, 182, 212, 0.1);
   color: var(--cyan);
   border: 1px solid rgba(6, 182, 212, 0.2);
+  transition: all 0.3s ease;
 }
 .tide-high .tide-badge {
-  background: rgba(6, 182, 212, 0.1);
-  color: var(--cyan);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  animation: badgePulse 2s infinite;
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--cyan-dark);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  animation: badgePulse 2.5s infinite;
 }
 .tide-low .tide-badge {
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--amber);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--amber-dark);
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 @keyframes badgePulse {
-  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); }
-  70% { box-shadow: 0 0 0 10px rgba(6, 182, 212, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2);
+    transform: scale(1);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(6, 182, 212, 0);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+    transform: scale(1);
+  }
 }
 .tide-time {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 800;
   font-family: var(--mono);
   line-height: 1;
   color: var(--text);
-  background: linear-gradient(135deg, #212529, var(--text));
+  background: linear-gradient(135deg, var(--text), var(--cyan-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  margin-bottom: 0.3rem;
 }
 .tide-height {
-  font-size: .82rem;
+  font-size: 0.9rem;
   color: var(--muted);
-  margin-top: .3rem;
+  margin-top: 0.3rem;
   font-family: var(--mono);
+  font-weight: 500;
 }
 .tide-high .tide-height {
-  color: var(--cyan);
-  font-weight: 600;
+  color: var(--cyan-dark);
 }
 .tide-low .tide-height {
-  color: var(--amber);
-  font-weight: 600;
+  color: var(--amber-dark);
 }
 
 /* ── Courbe ── */
@@ -1095,509 +1218,1033 @@ font-size: .78rem;
   overflow: hidden;
   border-radius: var(--r);
   background: var(--surface2);
-  padding: 1rem;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
 }
 .curve-svg {
   width: 100%;
   height: auto;
   display: block;
-  filter:
-svg {
-    drop-shadow(0 0 8px rgba(6, 182, 212, 0.2));
-  }
-  .curve-wrap .axis-hours {
-    display: flex;
-    justify-content: space-between;
-    padding: .4rem 0 0;
-    font-size: .7rem;
-    color: var(--muted);
-    font-family: var(--mono);
-    position: relative;
-  }
-  .curve-wrap .axis-hours::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-  }
+  filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.1));
+}
+.curve-wrap .axis-hours {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  position: relative;
+}
+.curve-wrap .axis-hours::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
 
-  /* Animation de la courbe */
-  .curve-path {
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: drawCurve 2s ease-out forwards;
-  }
-  @keyframes drawCurve {
-    to { stroke-dashoffset: 0; }
-  }
+/* Animation de la courbe */
+.curve-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawCurve 2.5s ease-out forwards;
+}
+@keyframes drawCurve {
+  to { stroke-dashoffset: 0; }
+}
 
-  /* Animation des points de marée */
-  .tide-point {
-    opacity: 0;
-    animation: fadeIn 0.5s ease-out forwards;
-  }
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-  .tide-point:nth-child(1) { animation-delay: 0.2s; }
-  .tide-point:nth-child(2) { animation-delay: 0.4s; }
-  .tide-point:nth-child(3) { animation-delay: 0.6s; }
-  .tide-point:nth-child(4) { animation-delay: 0.8s; }
+/* Animation des points de marée */
+.tide-point {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+.tide-point:nth-child(1) { animation-delay: 0.3s; }
+.tide-point:nth-child(2) { animation-delay: 0.6s; }
+.tide-point:nth-child(3) { animation-delay: 0.9s; }
+.tide-point:nth-child(4) { animation-delay: 1.2s; }
 
-  /* Animation du curseur maintenant */
-  .now-cursor {
-    opacity: 0;
-    animation: fadeIn 0.5s ease-out 1s forwards;
-  }
-  .now-text {
-    opacity: 0;
-    animation: fadeIn 0.5s ease-out 1.2s forwards;
-  }
+/* Animation du curseur maintenant */
+.now-cursor {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out 1.5s forwards;
+}
+.now-text {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out 1.7s forwards;
+}
 
-  /* ── Tableau 7 jours ── */
-  .days-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: var(--r);
-    overflow: hidden;
-    background: var(--surface2);
-  }
-  .days-table tr {
-    border-bottom: 1px solid var(--border);
-    transition: background .2s ease;
-  }
-  .days-table tr:last-child {
-    border-bottom: none;
-  }
-  .days-table tr:hover td {
-    background: var(--surface3);
-  }
-  .days-table td {
-    padding: .85rem 1rem;
-    font-size: .85rem;
-    vertical-align: middle;
-    position: relative;
-  }
-  .td-day {
-    font-weight: 700;
-    min-width: 120px;
-    color: var(--text);
-    position: relative;
-  }
-  .td-day::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 1px;
-    height: 60%;
-    background: var(--border);
-  }
-  .td-coeff {
-    min-width: 110px;
-    text-align: center;
-  }
-  .coeff-pip {
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: .9rem;
-    padding: .3rem .6rem;
-    border-radius: 8px;
-    background: rgba(6, 182, 212, 0.05);
-  }
-  .pip {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-  }
-  .pip-vive { background: var(--red); }
-  .pip-fort { background: var(--amber); }
-  .pip-moyen { background: var(--cyan); }
-  .pip-morte { background: var(--green); }
-  .td-tides {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem;
-    justify-content: flex-end;
-  }
-  .mini-tide {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: .3rem .7rem;
-    min-width: 68px;
-    transition: all .2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-  .mini-tide:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: var(--cyan);
-  }
-  .mini-tide-type {
-    font-size: .58rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    margin-bottom: .2rem;
-  }
-  .mini-tide.high .mini-tide-type {
-    color: var(--cyan);
-    background: rgba(6, 182, 212, 0.05);
-    padding: .1rem .3rem;
-    border-radius: 4px;
-  }
-  .mini-tide.low .mini-tide-type {
-    color: var(--amber);
-    background: rgba(245, 158, 11, 0.05);
-    padding: .1rem .3rem;
-    border-radius: 4px;
-  }
-  .mini-tide-time {
-    font-size: .82rem;
-    font-weight: 700;
-    font-family: var(--mono);
-    color: var(--text);
-  }
-  .mini-tide-h {
-    font-size: .7rem;
-    color: var(--muted);
-    font-family: var(--mono);
-  }
+/* ── Tableau 7 jours ── */
+.days-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--r);
+  overflow: hidden;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+.days-table tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+}
+.days-table tr:last-child {
+  border-bottom: none;
+}
+.days-table tr:hover td {
+  background: var(--surface3);
+}
+.days-table td {
+  padding: 1rem 1.2rem;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  position: relative;
+}
+.td-day {
+  font-weight: 700;
+  min-width: 130px;
+  color: var(--text);
+  position: relative;
+  font-family: var(--font);
+}
+.td-day::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background: var(--border);
+}
+.td-coeff {
+  min-width: 120px;
+  text-align: center;
+}
+.coeff-pip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(6, 182, 212, 0.08);
+  transition: all 0.3s ease;
+}
+.coeff-pip:hover {
+  background: rgba(6, 182, 212, 0.15);
+  transform: translateY(-1px);
+}
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+.pip-vive { background: var(--red); }
+.pip-fort { background: var(--amber); }
+.pip-moyen { background: var(--cyan); }
+.pip-morte { background: var(--green); }
+.td-tides {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+.mini-tide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.4rem 0.8rem;
+  min-width: 72px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.mini-tide:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--cyan);
+  background: rgba(6, 182, 212, 0.05);
+}
+.mini-tide-type {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+.mini-tide.high .mini-tide-type {
+  color: var(--cyan-dark);
+  background: rgba(6, 182, 212, 0.1);
+}
+.mini-tide.low .mini-tide-type {
+  color: var(--amber-dark);
+  background: rgba(245, 158, 11, 0.1);
+}
+.mini-tide-time {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--mono);
+  color: var(--text);
+}
+.mini-tide-h {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
 
-  /* ── Graphique 30 jours ── */
-  .graph-30days {
-    background: var(--surface2);
-    border-radius: var(--r);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  }
-  .graph-30days-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .graph-30days-title {
-    font-size: .82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--muted);
-  }
-  .graph-30days-subtitle {
-    font-size: .75rem;
-    color: var(--muted);
-    margin-top: .2rem;
-  }
-  .graph-30days-container {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: .5rem;
-  }
-  .graph-30days-svg {
-    min-width: 320px;
-    width: 100%;
-    height: 140px;
-  }
+/* ── Graphique 30 jours ── */
+.graph-30days {
+  background: var(--surface2);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
+}
+.graph-30days-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.graph-30days-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+.graph-30days-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--cyan);
+}
+.graph-30days-subtitle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+.graph-30days-container {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+.graph-30days-svg {
+  min-width: 320px;
+  width: 100%;
+  height: 160px;
+}
 
-  /* ── Section "Bon à savoir" ── */
-  .know-card {
-    background: var(--surface2);
-    border-radius: var(--r);
-    padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  }
-  .know-card-header {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--cyan);
-    margin-bottom: 1rem;
-    position: relative;
-    padding-bottom: .5rem;
-  }
-  .know-card-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 40px;
-    height: 2px;
-    background: var(--cyan);
-  }
+/* ── Section "Bon à savoir" ── */
+.know-card {
+  background: var(--surface2);
+  border-radius: var(--r);
+  padding: 2rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
+}
+.know-card-header {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--cyan-dark);
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.know-card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--cyan);
+  border-radius: 2px;
+}
+.know-content {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+@media (max-width: 768px) {
   .know-content {
-    display: flex;
-    gap: 2rem;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+.know-image {
+  flex: 1;
+  min-width: 220px;
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.5s ease;
+}
+.know-image:hover {
+  transform: scale(1.02);
+}
+.know-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+.know-image:hover img {
+  transform: scale(1.05);
+}
+.know-text {
+  flex: 2;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-light);
+}
+.know-text p {
+  margin-bottom: 1.2rem;
+}
+.know-text strong {
+  color: var(--cyan-dark);
+  font-weight: 600;
+}
+.know-fact {
+  background: rgba(6, 182, 212, 0.08);
+  border-left: 4px solid var(--cyan);
+  padding: 1.2rem;
+  margin: 1.8rem 0;
+  border-radius: 0 var(--r) var(--r) 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  font-style: italic;
+  color: var(--text);
+}
+
+/* ── API Status ── */
+.api-status {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+.api-status.success {
+  color: var(--green-dark);
+  border-color: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+}
+.api-status.error {
+  color: var(--red-dark);
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.
+css
+2);
+}
+.api-status.warning {
+  color: var(--amber-dark);
+  border-color: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.1);
+}
+.api-status::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  box-shadow: 0 0 4px currentColor;
+}
+.api-status.success::before { background: var(--green); }
+.api-status.error::before { background: var(--red); }
+.api-status.warning::before { background: var(--amber); }
+
+/* ── Carte interactive ── */
+.map-card {
+  background: var(--surface2);
+  border-radius: var(--r);
+  padding: 2rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border);
+}
+.map-card-header {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+.map-card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--cyan);
+}
+.interactive-map {
+  width: 100%;
+  height: auto;
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+.interactive-map:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+.port-marker {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+}
+.port-marker:hover {
+  r: 10;
+  stroke-width: 3;
+  stroke: var(--cyan);
+  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
+}
+.port-marker.active {
+  r: 10;
+  stroke-width: 3;
+  fill: var(--cyan);
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.7));
+}
+.port-label {
+  transition: all 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+}
+.port-marker:hover + .port-label,
+.port-marker.active + .port-label {
+  opacity: 1;
+  transform: translateY(-5px);
+}
+
+/* ── Badge "Meilleur moment pour pêcher" ── */
+.fishing-badge {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 4px solid var(--amber);
+  padding: 1.5rem;
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+}
+.fishing-badge:hover {
+  transform: translateX(2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.fishing-badge-icon {
+  font-size: 2.5rem;
+  animation: float 3s ease-in-out infinite;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fishing-badge-content {
+  flex: 1;
+}
+.fishing-badge-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--amber-dark);
+  margin-bottom: 0.4rem;
+  position: relative;
+  padding-bottom: 0.3rem;
+}
+.fishing-badge-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--amber);
+}
+.fishing-badge-time {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  background: linear-gradient(135deg, var(--text), var(--amber-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fishing-badge-info {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* ── Badge "Meilleur moment pour surfer" ── */
+.surfing-badge {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: rgba(6, 182, 212, 0.08);
+  border-left: 4px solid var(--cyan);
+  padding: 1.5rem;
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+.surfing-badge:hover {
+  transform: translateX(2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.surfing-badge-icon {
+  font-size: 2.5rem;
+  animation: float 3s ease-in-out infinite;
+  background: rgba(6, 182, 212, 0.1);
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.surfing-badge-content {
+  flex: 1;
+}
+.surfing-badge-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyan-dark);
+  margin-bottom: 0.4rem;
+  position: relative;
+  padding-bottom: 0.3rem;
+}
+.surfing-badge-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--cyan);
+}
+.surfing-badge-time {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  background: linear-gradient(135deg, var(--text), var(--cyan-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.surfing-badge-info {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* ── Badge "Meilleur moment pour naviguer" ── */
+.navigation-badge {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: rgba(29, 78, 216, 0.08);
+  border-left: 4px solid var(--blue);
+  padding: 1.5rem;
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(29, 78, 216, 0.1);
+}
+.navigation-badge:hover {
+  transform: translateX(2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+.navigation-badge-icon {
+  font-size: 2.5rem;
+  animation: float 3s ease-in-out infinite;
+  background: rgba(29, 78, 216, 0.1);
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.navigation-badge-content {
+  flex: 1;
+}
+.navigation-badge-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--blue-dark);
+  margin-bottom: 0.4rem;
+  position: relative;
+  padding-bottom: 0.3rem;
+}
+.navigation-badge-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--blue);
+}
+.navigation-badge-time {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  background: linear-gradient(135deg, var(--text), var(--blue-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.navigation-badge-info {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* ── Animation flottante ── */
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-5px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(-3px) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+/* ── Footer ── */
+footer {
+  text-align: center;
+  padding: 2.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  position: relative;
+  background: var(--surface);
+}
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(180deg, transparent, var(--surface));
+  pointer-events: none;
+}
+footer strong {
+  color: var(--cyan-dark);
+  font-weight: 600;
+}
+footer a {
+  color: var(--cyan);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+footer a:hover {
+  color: var(--cyan-dark);
+  text-decoration: underline;
+  transform: translateY(-1px);
+}
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.footer-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 1024px) {
+  .hero-port {
+    font-size: 2.8rem;
+  }
+  .hero-time {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem 0;
+  }
+  .hero-top {
+    flex-direction: column;
     align-items: flex-start;
   }
-  .know-image {
-    flex: 1;
-    min-width: 200px;
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  .hero-date {
+    text-align: left;
+    margin-top: 1rem;
   }
-  .know-image img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.5s ease;
+  .hero-port {
+    font-size: 2.2rem;
   }
-  .know-image:hover img {
-    transform: scale(1.05);
+  .hero-time {
+    font-size: 1.8rem;
   }
-  .know-text {
-    flex: 2;
-    font-size: .95rem;
-    line-height: 1.6;
-  }
-  .know-text p {
-    margin-bottom: 1rem;
-  }
-  .know-text strong {
-    color: var(--cyan);
-    font-weight: 600;
-  }
-  .know-fact {
-    background: rgba(6, 182, 212, 0.05);
-    border-left: 3px solid var(--cyan);
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 0 var(--r) var(--r) 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  /* ── API Status ── */
-  .api-status {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    padding: .3rem .6rem;
-    border-radius: 6px;
-    font-size: .7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-  }
-  .api-status.success {
-    color: var(--green);
-    border-color: rgba(16, 185, 129, 0.2);
-  }
-  .api-status.error {
-    color: var(--red);
-    border-color: rgba(239, 68, 68, 0.2);
-  }
-  .api-status.warning {
-    color: var(--amber);
-    border-color: rgba(245, 158, 11, 0.2);
-  }
-
-  /* ── Carte interactive ── */
-  .map-card {
-    background: var(--surface2);
-    border-radius: var(--r);
+  .main {
     padding: 1.5rem;
-    margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   }
-  .map-card-header {
-    font-size: .82rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--muted);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
+  .top-grid {
+    grid-template-columns: 1fr;
   }
-  .interactive-map {
-    width: 100%;
-    height: auto;
-    border-radius: var(--r);
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  .coeff-number {
+    font-size: 4rem;
   }
-  .port-marker {
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-  .port-marker:hover {
-    r: 10;
-    stroke-width: 3;
-  }
-  .port-marker.active {
-    r: 10;
-    stroke-width: 3;
-    fill: var(--cyan);
-  }
-  .port-label {
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .port-marker:hover + .port-label,
-  .port-marker.active + .port-label {
-    opacity: 1;
-  }
-
-  /* ── Badge "Meilleur moment pour pêcher" ── */
-  .fishing-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(245, 158, 11, 0.05);
-    border-left: 3px solid var(--amber);
-    padding: 1rem;
-    border-radius: 0 var(--r) var(--r) 0;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  .fishing-badge-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
-  }
-  .fishing-badge-content {
-    flex: 1;
-  }
-  .fishing-badge-title {
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--amber);
-    margin-bottom: .3rem;
-  }
-  .fishing-badge-time {
+  .tide-time {
     font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-    color: var(--text);
-    margin-bottom: .2rem;
   }
-  .fishing-badge-info {
-    font-size: .8rem;
-    color: var(--muted);
-  }
+}
 
-  /* ── Badge "Meilleur moment pour surfer" ── */
-  .surfing-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(6, 182, 212, 0.05);
-    border-left: 3px solid var(--cyan);
-    padding: 1rem;
-    border-radius: 0 var(--r) var(--r) 0;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+@media (max-width: 480px) {
+  :root {
+    --r: 12px;
   }
-  .surfing-badge-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
+  .hero-port {
+    font-size: 1.8rem;
   }
-  .surfing-badge-content {
-    flex: 1;
-  }
-  .surfing-badge-title {
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--cyan);
-    margin-bottom: .3rem;
-  }
-  .surfing-badge-time {
+  .hero-time {
     font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-    color: var(--text);
-    margin-bottom: .2rem;
   }
-  .surfing-badge-info {
-    font-size: .8rem;
-    color: var(--muted);
+  .coeff-number {
+    font-size: 3rem;
   }
+  .tide-time {
+    font-size: 1.3rem;
+  }
+  .port-nav-inner {
+    padding: 0 1rem;
+  }
+  .port-btn {
+    padding: 0.8rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-top">
+      <div>
+        <div class="site-brand"><?= SITE_NAME ?></div>
+        <h1 class="hero-port" data-icon="<?= esc($port['icon']) ?>"><?= esc($port['name']) ?></h1>
+        <div class="hero-region"><?= esc($port['region']) ?></div>
+      </div>
+      <div>
+        <div class="hero-date"><?= esc($date_label) ?></div>
+        <div class="hero-time" id="current-time"><?= date('H:i') ?></div>
+      </div>
+    </div>
+  </div>
+  <div class="waves-wrap">
+    <svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
+      <path class="wave-path" d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" />
+      <path class="wave-path" d="M0,70 C400,130 800,10 1200,70 L1200,120 L0,120 Z" style="animation-delay: -2s" />
+      <path class="wave-path" d="M0,80 C200,140 1000,20 1200,80 L1200,120 L0,120 Z" style="animation-delay: -4s" />
+    </svg>
+  </div>
+</div>
 
-  /* ── Badge "Meilleur moment pour naviguer" ── */
-  .navigation-badge {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(29, 78, 216, 0.05);
-    border-left: 3px solid var(--blue);
-    padding: 1rem;
-    border-radius: 0 var(--r) var(--r) 0;
-    margin-top: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  .navigation-badge-icon {
-    font-size: 2rem;
-    animation: float 3s ease-in-out infinite;
-  }
-  .navigation-badge-content {
-    flex: 1;
-  }
-  .navigation-badge-title {
-    font-size: .8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--blue);
-    margin-bottom: .3rem;
-  }
-  .navigation-badge-time {
-    font-size: 1.5rem;
-    font-weight: 800;
-    font-family: var(--mono);
-    color: var(--text);
-    margin-bottom: .2rem;
-  }
-  .navigation-badge-info {
-    font-size: .8rem;
-    color: var(--muted);
-  }
+<nav class="port-nav">
+  <div class="port-nav-inner">
+    <?php foreach ($PORTS as $key => $p): ?>
+      <a href="?port=<?= esc($key) ?>" class="port-btn <?= $key === $port_key ? 'active' : '' ?>">
+        <?= esc($p['icon']) ?> <?= esc($p['name']) ?>
+      </a>
+    <?php endforeach; ?>
+  </div>
+</nav>
 
-  /* ── Footer ── */
-  footer {
-    text-align: center;
-    padding: 2rem;
-    font-size: .75rem;
-    color: var(--muted);
-    border-top: 1px solid var(--border);
-    margin-top: 2rem;
-    position: relative;
+<main class="main">
+  <div class="top-grid">
+    <div class="card glass-card">
+      <div class="card-header">
+        <span>Coefficient de marée</span>
+      </div>
+      <div class="card-body coeff-card coeff-<?= coeffClass($today_data['coeff']) ?>">
+        <div class="coeff-gauge-container">
+          <?= $coeffGauge ?>
+        </div>
+        <div class="coeff-number"><?= $today_data['coeff'] ?></div>
+        <div class="coeff-label"><?= coeffLabel($today_data['coeff']) ?></div>
+        <div class="coeff-title">Aujourd'hui</div>
+        <div class="coeff-gauge-info">
+          <span><span class="pip pip-morte"></span> Mortes eaux</span>
+          <span><span class="pip pip-moyen"></span> Moyen</span>
+          <span><span class="pip pip-fort"></span> Fort</span>
+          <span><span class="pip pip-vive"></span> Vives eaux</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card glass-card">
+      <div class="card-header">
+        <span>Marées du jour</span>
+      </div>
+      <div class="card-body">
+        <?= generateTideProgressBar($today_data, $port) ?>
+
+        <div class="tides-grid">
+          <?php foreach ($today_data['tides'] as $i => $tide): ?>
+            <div class="tide-item <?= $tide['type'] ?>">
+              <div class="tide-badge"><?= $tide['type'] === 'high' ? 'Pleine mer' : 'Basse mer' ?></div>
+              <div class="tide-time"><?= esc($tide['time']) ?></div>
+              <div class="tide-height"><?= number_format($tide['height'], 2) ?> m</div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+
+        <div class="curve-wrap">
+          <svg class="curve-svg" viewBox="0 0 960 160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#0891b2" stop-opacity="0.8" />
+              </linearGradient>
+            </defs>
+            <path d="<?= $svg_path ?>" fill="none" stroke="url(#curveGrad)" stroke-width="3" class="curve-path" />
+            <?php foreach ($today_data['tides'] as $i => $tide): ?>
+              <circle cx="<?= round($i / (count($today_data['tides']) - 1) * 960, 1) ?>" cy="<?= round(160 - 14 - ($tide['height'] - $port['range_low']) / $rng * 132, 1) ?>" r="5" fill="<?= $tide['type'] === 'high' ? '#06b6d4' : '#f59e0b' ?>" class="tide-point" />
+            <?php endforeach; ?>
+            <line x1="<?= $now_x ?>" y1="0" x2="<?= $now_x ?>" y2="160" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,3" class="now-cursor" />
+            <text x="<?= $now_x ?>" y="20" font-size="12" fill="#ffffff" text-anchor="middle" class="now-text">Maintenant</text>
+          </svg>
+          <div class="axis-hours">
+            <span>00:00</span>
+            <span>06:00</span>
+            <span>12:00</span>
+            <span>18:00</span>
+            <span>24:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card glass-card">
+    <div class="card-header">
+      <span>Prévisions sur 7 jours</span>
+    </div>
+    <div class="card-body">
+      <table class="days-table">
+        <?php foreach ($days as $day): ?>
+          <tr>
+            <td class="td-day"><?= esc($day['label']) ?></td>
+            <td class="td-coeff">
+              <span class="coeff-pip">
+                <span class="pip pip-<?= coeffClass($day['coeff']) ?>"></span>
+                <?= $day['coeff'] ?>
+              </span>
+            </td>
+            <td class="td-tides">
+              <?php foreach ($day['tides'] as $tide): ?>
+                <div class="mini-tide <?= $tide['type'] ?>">
+                  <div class="mini-tide-type"><?= $tide['type'] === 'high' ? 'PM' : 'BM' ?></div>
+                  <div class="mini-tide-time"><?= esc($tide['time']) ?></div>
+                  <div class="mini-tide-h"><?= number_format($tide['height'], 2) ?> m</div>
+                </div>
+              <?php endforeach; ?>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </table>
+    </div>
+  </div>
+
+  <div class="card glass-card">
+    <div class="card-header">
+      <span>Évolution sur 30 jours</span>
+    </div>
+    <div class="card-body">
+      <div class="graph-30days">
+        <div class="graph-30days-header">
+          <div>
+            <div class="graph-30days-title">Coefficients de marée</div>
+            <div class="graph-30days-subtitle">Cycle lunaire complet</div>
+          </div>
+        </div>
+        <div class="graph-30days-container">
+          <?= $graph30Days ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card glass-card">
+    <div class="card-header">
+      <span>Bon à savoir</span>
+    </div>
+    <div class="card-body know-card">
+      <div class="know-content">
+        <div class="know-image">
+          <img src="https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Port de <?= esc($port['name']) ?>">
+        </div>
+        <div class="know-text">
+          <p><strong><?= esc($port['name']) ?></strong> est un port situé en <strong><?= esc($port['region']) ?></strong>, connu pour <?= esc(strtolower($port['desc'])) ?>. Les marées y sont particulièrement importantes avec des coefficients pouvant atteindre <strong><?= $port['range_high'] ?> m</strong> en période de vives eaux.</p>
+          <p>Les marées sont causées par l'attraction gravitationnelle de la Lune et du Soleil sur les océans. À <?= esc($port['name']) ?>, le marnage (différence entre haute et basse mer) peut varier considérablement selon les périodes du mois lunaire.</p>
+          <div class="know-fact">
+            Saviez-vous que le coefficient de marée à <?= esc($port['name']) ?> peut atteindre jusqu'à 120 en période de vives eaux, ce qui indique des marées particulièrement fortes ?
+          </div>
+          <p>Pour les activités nautiques, il est recommandé de consulter les horaires de marée avant de planifier vos sorties. Les périodes autour des pleines et nouvelles lunes sont généralement les plus propices aux marées fortes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card glass-card">
+    <div class="card-header">
+      <span>Carte interactive</span>
+    </div>
+    <div class="card-body map-card">
+      <?= $interactiveMap ?>
+      <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--muted); text-align: center;">
+        Cliquez sur un port pour afficher ses horaires de marée
+      </div>
+    </div>
+  </div>
+
+  <div class="card glass-card">
+    <div class="card-header">
+      <span>Activités recommandées</span>
+    </div>
+    <div class="card-body">
+      <?= $fishingBadge ?>
+      <?= $surfingBadge ?>
+      <?= $navigationBadge ?>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div>© <?= date('Y') ?> <strong><?= SITE_NAME ?></strong> — v<?= VERSION ?></div>
+  <div class="footer-links">
+    <a href="#">À propos</a>
+    <a href="#">Contact</a>
+    <a href="#">Conditions d'utilisation</a>
+    <a href="#">Confidentialité</a>
+    <a href="#">API WorldTides</a>
+  </div>
+</footer>
+
+<div class="api-status <?= isset($apiData['status']) && $apiData['status'] === 'error' ? 'error' : 'success' ?>">
+  <?= isset($apiData['status']) && $apiData['status'] === 'error' ? 'Données simulées' : 'Données temps réel' ?>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Mise à jour de l'heure en temps réel
+  function updateTime() {
+    const now = new Date();
+    const timeString = now.getHours().toString().padStart(2, '0') + ':' +
+                       now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('current-time').textContent = timeString;
   }
-  footer strong {
-    color: var(--cyan);
-    font-weight: 600;
-  }
-  footer a {
-    color: var(--cyan);
-    text-decoration: none;
-    transition: color .2s ease;
-  }
-  footer a:hover {
-    color: #06b
-text-decoration: underline;
-  }
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  // Animation des badges d'activités
+  const badges = document.querySelectorAll('.fishing-badge, .surfing-badge, .navigation-badge');
+  badges.forEach(badge => {
+    badge.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateX(4px)';
+    });
+    badge.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateX(2px)';
+    });
+  });
+
+  // Animation des cartes
+  const cards = document.querySelectorAll('.card, .glass-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-6px)';
+    });
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(-4px)';
+    });
+  });
+});
+</script>
+</body>
+</html>
