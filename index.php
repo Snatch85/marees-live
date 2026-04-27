@@ -2,44 +2,36 @@
 /**
  * MaréesLive — Horaires des marées en France
  * ─────────────────────────────────────────────────────────────────────────────
- * v3.6.2 — Design professionnel avec animations immersives et visualisations améliorées
+ * v3.7.0 — Intégration API WorldTides pour des données officielles
  */
 
-define('VERSION',   '3.6.2');
+define('VERSION',   '3.7.0');
 define('SITE_NAME', 'MaréesLive');
-define('API_KEY',   'YOUR_WORLDTIDES_API_KEY'); // Remplacez par votre clé API WorldTides
+define('WORLDTIDES_KEY', 'VOTRE_CLE_ICI'); // Remplacez par votre clé API WorldTides
 
 $JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 $MOIS  = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
 
-// ── Ports français ────────────────────────────────────────────────────────────
+// ── Ports Loire-Atlantique avec coordonnées exactes et marnage de référence ──
 $PORTS = [
-    'le-croisic' => [
-        'name'       => 'Le Croisic',
+    'saint-nazaire' => [
+        'name'       => 'Saint-Nazaire',
         'region'     => 'Loire-Atlantique',
-        'icon'       => '🌊',
-        'lat'        => 47.2989,
-        'lon'        => -2.5128,
-        'range_low'  => 1.2,
-        'range_high' => 8.5,
-        'desc'       => 'Port pittoresque avec vue sur l\'île de Noirmoutier',
-    ],
-    'la-turballe' => [
-        'name'       => 'La Turballe',
-        'region'     => 'Loire-Atlantique',
-        'icon'       => '⚓',
-        'lat'        => 47.3467,
-        'lon'        => -2.5097,
-        'range_low'  => 1.1,
-        'range_high' => 8.2,
-        'desc'       => 'Port de pêche et de plaisance',
+        'icon'       => '🚢',
+        'lat'        => 47.2706,
+        'lon'        => -2.2132,
+        'ref_marnage' => 5.10,
+        'range_low'  => 1.5,
+        'range_high' => 9.5,
+        'desc'       => 'Port maritime important',
     ],
     'la-baule' => [
         'name'       => 'La Baule',
         'region'     => 'Loire-Atlantique',
         'icon'       => '🏖️',
-        'lat'        => 47.2854,
-        'lon'        => -2.3967,
+        'lat'        => 47.2889,
+        'lon'        => -2.3889,
+        'ref_marnage' => 4.90,
         'range_low'  => 1.3,
         'range_high' => 8.8,
         'desc'       => 'Station balnéaire renommée',
@@ -48,61 +40,89 @@ $PORTS = [
         'name'       => 'Pornichet',
         'region'     => 'Loire-Atlantique',
         'icon'       => '🏝️',
-        'lat'        => 47.2628,
-        'lon'        => -2.3408,
+        'lat'        => 47.2658,
+        'lon'        => -2.3397,
+        'ref_marnage' => 4.90,
         'range_low'  => 1.4,
         'range_high' => 9.1,
         'desc'       => 'Ville balnéaire avec plage de sable fin',
     ],
-    'saint-nazaire' => [
-        'name'       => 'Saint-Nazaire',
-        'region'     => 'Loire-Atlantique',
-        'icon'       => '🚢',
-        'lat'        => 47.2736,
-        'lon'        => -2.2137,
-        'range_low'  => 1.5,
-        'range_high' => 9.5,
-        'desc'       => 'Port maritime important',
-    ],
-    'saint-brevin-les-pins' => [
-        'name'       => 'Saint-Brevin-les-Pins',
-        'region'     => 'Loire-Atlantique',
-        'icon'       => '🌳',
-        'lat'        => 47.2431,
-        'lon'        => -2.1681,
-        'range_low'  => 1.6,
-        'range_high' => 9.8,
-        'desc'       => 'Village de pêcheurs avec vue sur l\'estuaire',
-    ],
-    'pornic' => [
-        'name'       => 'Pornic',
+    'le-croisic' => [
+        'name'       => 'Le Croisic',
         'region'     => 'Loire-Atlantique',
         'icon'       => '🌊',
-        'lat'        => 47.1128,
-        'lon'        => -2.1008,
-        'range_low'  => 1.7,
-        'range_high' => 10.2,
-        'desc'       => 'Port de pêche traditionnel',
+        'lat'        => 47.2950,
+        'lon'        => -2.5136,
+        'ref_marnage' => 4.80,
+        'range_low'  => 1.2,
+        'range_high' => 8.5,
+        'desc'       => 'Port pittoresque avec vue sur l\'île de Noirmoutier',
     ],
-    'prefailles' => [
-        'name'       => 'Préfailles',
+    'la-turballe' => [
+        'name'       => 'La Turballe',
         'region'     => 'Loire-Atlantique',
-        'icon'       => '🌊',
-        'lat'        => 47.1389,
-        'lon'        => -2.2131,
-        'range_low'  => 1.8,
-        'range_high' => 10.5,
-        'desc'       => 'Port de pêche avec vue sur l\'estuaire',
+        'icon'       => '⚓',
+        'lat'        => 47.3489,
+        'lon'        => -2.5158,
+        'ref_marnage' => 4.75,
+        'range_low'  => 1.1,
+        'range_high' => 8.2,
+        'desc'       => 'Port de pêche et de plaisance',
     ],
     'piriac-sur-mer' => [
         'name'       => 'Piriac-sur-Mer',
         'region'     => 'Loire-Atlantique',
         'icon'       => '🌊',
-        'lat'        => 47.3797,
-        'lon'        => -2.5444,
+        'lat'        => 47.3808,
+        'lon'        => -2.5447,
+        'ref_marnage' => 4.60,
         'range_low'  => 1.9,
         'range_high' => 10.8,
         'desc'       => 'Port de pêche avec vue sur l\'estuaire',
+    ],
+    'pornic' => [
+        'name'       => 'Pornic',
+        'region'     => 'Loire-Atlantique',
+        'icon'       => '🌊',
+        'lat'        => 47.1111,
+        'lon'        => -2.1011,
+        'ref_marnage' => 4.50,
+        'range_low'  => 1.7,
+        'range_high' => 10.2,
+        'desc'       => 'Port de pêche traditionnel',
+    ],
+    'saint-brevin' => [
+        'name'       => 'Saint-Brévin',
+        'region'     => 'Loire-Atlantique',
+        'icon'       => '🌳',
+        'lat'        => 47.2439,
+        'lon'        => -2.1611,
+        'ref_marnage' => 5.00,
+        'range_low'  => 1.6,
+        'range_high' => 9.8,
+        'desc'       => 'Village de pêcheurs avec vue sur l\'estuaire',
+    ],
+    'noirmoutier' => [
+        'name'       => 'Noirmoutier',
+        'region'     => 'Loire-Atlantique',
+        'icon'       => '🏝️',
+        'lat'        => 47.0003,
+        'lon'        => -2.2508,
+        'ref_marnage' => 4.20,
+        'range_low'  => 1.0,
+        'range_high' => 7.2,
+        'desc'       => 'Île aux 80 km de côtes',
+    ],
+    "l-herbaudiere" => [
+        'name'       => "L'Herbaudière",
+        'region'     => 'Loire-Atlantique',
+        'icon'       => '🌊',
+        'lat'        => 47.0217,
+        'lon'        => -2.3036,
+        'ref_marnage' => 4.10,
+        'range_low'  => 1.1,
+        'range_high' => 7.5,
+        'desc'       => 'Port de pêche traditionnel',
     ],
 ];
 
@@ -127,27 +147,48 @@ function coeffLabel(int $c): string {
 }
 
 // ── Fonctions de calcul et API ────────────────────────────────────────────────
-function fetchWorldTidesData(float $lat, float $lon, int $start, int $days = 7): array {
-    global $API_KEY;
-    $url = "https://www.worldtides.info/api/v3?extremes&lat={$lat}&lon={$lon}&start={$start}&length={$days}day&key={$API_KEY}";
-    $cache_file = __DIR__ . '/cache/' . md5($url) . '.json';
-    $cache_time = 3600; // 1 heure
+function fetchWorldTidesData(float $lat, float $lon, int $days = 3): array {
+    global $JOURS, $MOIS;
+    global $WORLDTIDES_KEY;
 
-    if (file_exists($cache_file) && (time() - filemtime($cache_file) < $cache_time)) {
-        return json_decode(file_get_contents($cache_file), true);
+    // Vérification de la clé API
+    if ($WORLDTIDES_KEY === 'VOTRE_CLE_ICI') {
+        return ['status' => 'error', 'message' => 'Clé API WorldTides non configurée'];
     }
 
-    $response = @file_get_contents($url);
-    if ($response === false) {
-        return ['status' => 'error', 'message' => 'Impossible de se connecter à l\'API WorldTides'];
+    $cacheFile = sys_get_temp_dir() . '/tides_' . md5("$lat,$lon,$days") . '_' . date('YmdH') . '.json';
+    $cacheTime = 6 * 3600; // Cache de 6 heures
+
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTime)) {
+        $data = json_decode(file_get_contents($cacheFile), true);
+        if (isset($data['status']) && $data['status'] === 200) {
+            return $data;
+        }
     }
 
-    $data = json_decode($response, true);
-    if (isset($data['status']) && $data['status'] === 'error') {
-        return $data;
+    $url = "https://www.worldtides.info/api/v3?extremes&heights&date=today&days={$days}&step=1800&datum=LAT&localtime"
+         . "&lat={$lat}&lon={$lon}&key=" . WORLDTIDES_KEY;
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_FAILONERROR => true
+    ]);
+    $raw = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode !== 200) {
+        return ['status' => 'error', 'message' => 'Erreur API WorldTides: HTTP ' . $httpCode];
     }
 
-    file_put_contents($cache_file, $response);
+    $data = json_decode($raw, true);
+    if (($data['status'] ?? 0) !== 200) {
+        return ['status' => 'error', 'message' => 'Erreur API WorldTides: ' . ($data['message'] ?? 'Réponse invalide')];
+    }
+
+    file_put_contents($cacheFile, $raw);
     return $data;
 }
 
@@ -159,6 +200,7 @@ function processTideData(array $apiData, array $port): array {
     if (isset($apiData['extremes'])) {
         $tides = $apiData['extremes'];
         $current_day = null;
+        $last_high = null;
 
         foreach ($tides as $tide) {
             $ts = $tide['dt'];
@@ -187,13 +229,25 @@ function processTideData(array $apiData, array $port): array {
                 ];
             }
 
-            $current_day_data['tides'][] = [
+            $tide_entry = [
                 'ts' => $ts,
                 'time' => date('H:i', $ts),
                 'height' => round($tide['height'], 2),
                 'type' => $tide['type'] === 'High' ? 'high' : 'low',
                 'coeff' => isset($tide['coefficient']) ? (int)$tide['coefficient'] : 70
             ];
+
+            // Calcul du coefficient entre deux marées
+            if ($tide_entry['type'] === 'low' && $last_high !== null) {
+                $coeff = calculateCoefficient($last_high['height'], $tide_entry['height'], $port['ref_marnage']);
+                $tide_entry['coeff'] = $coeff;
+            }
+
+            if ($tide_entry['type'] === 'high') {
+                $last_high = $tide_entry;
+            }
+
+            $current_day_data['tides'][] = $tide_entry;
         }
 
         if ($current_day !== null) {
@@ -224,6 +278,12 @@ function processTideData(array $apiData, array $port): array {
     }
 
     return $days;
+}
+
+function calculateCoefficient(float $high, float $low, float $ref_marnage): int {
+    $marnage = $high - $low;
+    $coeff = round(($marnage / $ref_marnage) * 95);
+    return max(20, min(120, $coeff));
 }
 
 // Hauteur de l'eau à un instant donné (modèle sinusoïdal simplifié)
@@ -290,7 +350,7 @@ function curvePoints(int $day_start, array $p, int $W = 960, int $H = 160): arra
 
 // ── Préparer les données ──────────────────────────────────────────────────────
 $today_ts = mktime(0, 0, 0);
-$apiData = fetchWorldTidesData($port['lat'], $port['lon'], $today_ts);
+$apiData = fetchWorldTidesData($port['lat'], $port['lon']);
 $days = processTideData($apiData, $port);
 
 $today_data = $days[0] ?? [
@@ -306,8 +366,8 @@ $svg_path = 'M ' . implode(' L ', $curve_pts);
 // Position du curseur "maintenant"
 $now_frac = min(1.0, max(0.0, (time() - $today_ts) / 86400));
 $now_x = round($now_frac * 960, 1);
-$now_h = isset($apiData['heights']) ? $apiData['heights'][0]['height'] : tideAt(time(), $port);
-$prev_h = isset($apiData['heights']) ? $apiData['heights'][0]['height'] - 0.1 : tideAt(time() - 300, $port);
+$now_h = isset($apiData['heights']) ? ($apiData['heights'][0]['height'] ?? tideAt(time(), $port)) : tideAt(time(), $port);
+$prev_h = isset($apiData['heights']) ? ($apiData['heights'][0]['height'] ?? tideAt(time() - 300, $port)) - 0.1 : tideAt(time() - 300, $port);
 $rng = $port['range_high'] - $port['range_low'];
 $now_y = round(160 - 14 - ($now_h - $port['range_low']) / $rng * 132, 1);
 
@@ -477,11 +537,16 @@ function generateTideProgressBar(array $today_data, array $port): string {
 function generateFishingBadge(array $today_data): string {
     $best_tide = null;
     $best_time = null;
+    $best_coeff = 0;
 
     foreach ($today_data['tides'] as $tide) {
-        if ($tide['type'] === 'low' && ($best_tide === null || $tide['height'] < $best_tide['height'])) {
-            $best_tide = $tide;
-            $best_time = $tide['time'];
+        if ($tide['type'] === 'low') {
+            $coeff = $tide['coeff'] ?? 0;
+            if ($best_tide === null || $coeff > $best_coeff) {
+                $best_tide = $tide;
+                $best_time = $tide['time'];
+                $best_coeff = $coeff;
+            }
         }
     }
 
@@ -495,6 +560,18 @@ function generateFishingBadge(array $today_data): string {
     $html .= '<div class="fishing-badge-title">Meilleur moment pour pêcher</div>';
     $html .= '<div class="fishing-badge-time">' . esc($best_time) . '</div>';
     $html .= '<div class="fishing-badge-info">Basse mer à ' . number_format($best_tide['height'], 2) . ' m</div>';
+
+    if ($best_coeff > 70) {
+        $start_time = date('H:i', strtotime($best_time) - 2 * 3600);
+        $end_time = date('H:i', strtotime($best_time) + 2 * 3600);
+        $badge_class = $best_coeff > 95 ? 'green' : ($best_coeff >= 70 ? 'orange' : 'gray');
+
+        $html .= '<div class="fishing-badge-ideal">';
+        $html .= '<span class="badge-label">Créneau idéal :</span>';
+        $html .= '<span class="badge-time">' . esc($start_time) . ' → ' . esc($end_time) . '</span>';
+        $html .= '</div>';
+    }
+
     $html .= '</div>';
     $html .= '</div>';
 
@@ -509,9 +586,11 @@ function generateSurfingBadge(array $today_data): string {
     $best_time = null;
 
     foreach ($today_data['tides'] as $tide) {
-        if ($tide['type'] === 'high' && ($best_tide === null || $tide['height'] > $best_tide['height'])) {
-            $best_tide = $tide;
-            $best_time = $tide['time'];
+        if ($tide['type'] === 'high') {
+            if ($best_tide === null || $tide['height'] > $best_tide['height']) {
+                $best_tide = $tide;
+                $best_time = $tide['time'];
+            }
         }
     }
 
@@ -539,9 +618,11 @@ function generateNavigationBadge(array $today_data): string {
     $best_time = null;
 
     foreach ($today_data['tides'] as $tide) {
-        if ($tide['type'] === 'low' && ($best_tide === null || $tide['height'] < $best_tide['height'])) {
-            $best_tide = $tide;
-            $best_time = $tide['time'];
+        if ($tide['type'] === 'low') {
+            if ($best_tide === null || $tide['height'] < $best_tide['height']) {
+                $best_tide = $tide;
+                $best_time = $tide['time'];
+            }
         }
     }
 
@@ -574,21 +655,21 @@ $navigationBadge = generateNavigationBadge($today_data);
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f8fafc;
-  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  --surface: #ffffff;
-  --surface2: #f8fafc;
-  --surface3: #f1f5f9;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(6, 182, 212, 0.3);
-  --text: #1e293b;
-  --text-light: #64748b;
-  --text-lighter: #94a3b8;
+  --bg: #0a0e1a;
+  --bg-gradient: linear-gradient(135deg, #0a0e1a 0%, #1a202c 100%);
+  --surface: #1a202c;
+  --surface2: #2d3748;
+  --surface3: #4a5568;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(0, 212, 255, 0.3);
+  --text: #e2e8f0;
+  --text-light: #a0aec0;
+  --text-lighter: #718096;
   --muted: #94a3b8;
-  --cyan: #06b6d4;
+  --cyan: #00d4ff;
   --cyan-light: #67e8f9;
-  --cyan-dark: #0891b2;
-  --cyan-darker: #155e75;
+  --cyan-dark: #0077b6;
+  --cyan-darker: #003049;
   --blue: #3b82f6;
   --blue-dark: #1d4ed8;
   --green: #10b981;
@@ -601,11 +682,11 @@ $navigationBadge = generateNavigationBadge($today_data);
   --purple: #8b5cf6;
   --r: 16px;
   --r-lg: 24px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.25);
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'JetBrains Mono', 'Fira Code', monospace;
   --display: 'Playfair Display', serif;
@@ -642,8 +723,7 @@ body {
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(240, 249, 255,
-0.8) 100%);
+  background: linear-gradient(180deg, rgba(10, 14, 26, 0.9) 0%, rgba(26, 32, 44, 0.8) 100%);
   padding: 4rem 0 6rem;
   min-height: 400px;
   box-shadow: var(--shadow-lg);
@@ -660,7 +740,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, rgba(240, 249, 255, 0.8) 100%);
+  background: linear-gradient(180deg, rgba(10, 14, 26, 0.9) 0%, rgba(26, 32, 44, 0.8) 100%);
   z-index: 1;
 }
 
@@ -690,12 +770,12 @@ body {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  background: rgba(6, 182, 212, 0.1);
+  background: rgba(0, 212, 255, 0.1);
   padding: 0.6rem 1.2rem;
   border-radius: 50px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  border: 1px solid rgba(0, 212, 255, 0.2);
   box-shadow: var(--shadow-sm);
 }
 
@@ -714,11 +794,11 @@ body {
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.1;
-  background: linear-gradient(135deg, var(--text), var(--cyan-darker));
+  background: linear-gradient(135deg, var(--text), var(--cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
   font-family: var(--display);
   margin-bottom: 0.5rem;
   position: relative;
@@ -746,12 +826,12 @@ body {
   text-align: right;
   font-size: 0.9rem;
   color: var(--text-light);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.6rem 1.2rem;
   border-radius: 50px;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: var(--shadow-sm);
 }
 
@@ -759,10 +839,10 @@ body {
   font-size: 2.8rem;
   font-weight: 700;
   font-family: var(--mono);
-  color: var(--cyan-dark);
-  text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
   margin-bottom: 0.3rem;
-  background: rgba(6, 182, 212, 0.1);
+  background: rgba(0, 212, 255, 0.1);
   padding: 0.6rem 1.2rem;
   border-radius: 12px;
   display: inline-block;
@@ -788,7 +868,7 @@ body {
 
 .wave-path {
   fill: none;
-  stroke: rgba(6, 182, 212, 0.15);
+  stroke: rgba(0, 212, 255, 0.15);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -799,12 +879,12 @@ body {
   0% {
     stroke-dasharray: 0 100%;
     opacity: 0.3;
-    stroke: rgba(6, 182, 212, 0.1);
+    stroke: rgba(0, 212, 255, 0.1);
   }
   100% {
     stroke-dasharray: 100% 0;
     opacity: 0.6;
-    stroke: rgba(6, 182, 212, 0.25);
+    stroke: rgba(0, 212, 255, 0.25);
   }
 }
 
@@ -847,15 +927,15 @@ body {
 .port-btn:hover {
   color: var(--text);
   transform: translateY(-2px);
-  background: rgba(6, 182, 212, 0.05);
+  background: rgba(0, 212, 255, 0.05);
 }
 
 .port-btn.active {
-  color: var(--cyan-dark);
+  color: var(--cyan);
   border-bottom-color: var(--cyan);
   transform: translateY(-2px);
-  background: rgba(6, 182, 212, 0.1);
-  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.1);
+  background: rgba(0, 212, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.1);
 }
 
 .port-btn::after {
@@ -890,16 +970,16 @@ body {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(26, 32, 44, 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(6, 182, 212, 0.3);
+  border-color: rgba(0, 212, 255, 0.3);
 }
 
 .card-header {
@@ -956,7 +1036,7 @@ body {
   padding: 2rem 1rem;
   text-align: center;
   position: relative;
-  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
   border-radius: var(--r);
 }
 
@@ -969,18 +1049,18 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
   animation: pulse 2.5s infinite alternate;
 }
 
 @keyframes pulse {
   0% {
     transform: scale(1);
-    text-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+    text-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
   }
   100% {
     transform: scale(1.03);
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   }
 }
 
@@ -992,15 +1072,15 @@ body {
   padding: 0.4rem 1.2rem;
   border-radius: 50px;
   margin-top: 0.4rem;
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(0, 212, 255, 0.15);
   color: var(--cyan-dark);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.08);
   transition: all 0.3s ease;
 }
 
 .coeff-label:hover {
-  background: rgba(6, 182, 212, 0.25);
+  background: rgba(0, 212, 255, 0.25);
   transform: translateY(-1px);
 }
 
@@ -1053,9 +1133,9 @@ body {
 }
 
 .coeff-moyen .coeff-label {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(0, 212, 255, 0.15);
   color: var(--cyan-dark);
-  border: 1px solid rgba(6, 182, 212, 0.3);
+  border: 1px solid rgba(0, 212, 255, 0.3);
 }
 
 .coeff-morte .coeff-number {
@@ -1121,12 +1201,12 @@ body {
 
 .tide-progress {
   height: 24px;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   overflow: hidden;
   position: relative;
   box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tide-progress-bar {
@@ -1135,7 +1215,7 @@ body {
   border-radius: 12px;
   transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
 }
 
 .tide-progress-bar::after {
@@ -1146,7 +1226,7 @@ body {
   bottom: 0;
   width: 2px;
   background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 6px rgba(0, 212, 255, 0.5);
 }
 
 .tide-progress-info {
@@ -1222,36 +1302,36 @@ body {
   border-radius: 50px;
   margin-bottom: 0.6rem;
   display: inline-block;
-  background: rgba(6, 182, 212, 0.1);
+  background: rgba(0, 212, 255, 0.1);
   color: var(--cyan);
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  border: 1px solid rgba(0, 212, 255, 0.2);
   transition: all 0.3s ease;
 }
 
 .tide-high .tide-badge {
-  background: rgba(6, 182, 212, 0.15);
-  color: var(--cyan-dark);
-  border: 1px solid rgba(6, 182, 212, 0.3);
+  background: rgba(0, 212, 255, 0.15);
+  color: var(--cyan);
+  border: 1px solid rgba(0, 212, 255, 0.3);
   animation: badgePulse 2.5s infinite;
 }
 
 .tide-low .tide-badge {
   background: rgba(245, 158, 11, 0.15);
-  color: var(--amber-dark);
+  color: var(--amber);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 @keyframes badgePulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2);
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.2);
     transform: scale(1);
   }
   70% {
-    box-shadow: 0 0 0 12px rgba(6, 182, 212, 0);
+    box-shadow: 0 0 0 12px rgba(0, 212, 255, 0);
     transform: scale(1.05);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
     transform: scale(1);
   }
 }
@@ -1262,7 +1342,7 @@ body {
   font-family: var(--mono);
   line-height: 1;
   color: var(--text);
-  background: linear-gradient(135deg, var(--text), var(--cyan-dark));
+  background: linear-gradient(135deg, var(--text), var(--cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1278,11 +1358,11 @@ body {
 }
 
 .tide-high .tide-height {
-  color: var(--cyan-dark);
+  color: var(--cyan);
 }
 
 .tide-low .tide-height {
-  color: var(--amber-dark);
+  color: var(--amber);
 }
 
 /* ── Courbe des marées ── */
@@ -1293,7 +1373,7 @@ body {
   border-radius: var(--r);
   background: var(--surface2);
   padding: 1.5rem;
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.03);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
   margin-top: 1.5rem;
 }
@@ -1302,7 +1382,7 @@ body {
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.1));
+  filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.1));
 }
 
 .curve-wrap .axis-hours {
@@ -1424,12 +1504,12 @@ body {
   font-size: 0.95rem;
   padding: 0.4rem 0.8rem;
   border-radius: 10px;
-  background: rgba(6, 182, 212, 0.08);
+  background: rgba(0, 212, 255, 0.08);
   transition: all 0.3s ease;
 }
 
 .coeff-pip:hover {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(0, 212, 255, 0.15);
   transform: translateY(-1px);
 }
 
@@ -1470,7 +1550,7 @@ body {
   transform: translateY(-3px);
   box-shadow: var(--shadow);
   border-color: var(--cyan);
-  background: rgba(6, 182, 212, 0.05);
+  background: rgba(0, 212, 255, 0.05);
 }
 
 .mini-tide-type {
@@ -1484,12 +1564,12 @@ body {
 }
 
 .mini-tide.high .mini-tide-type {
-  color: var(--cyan-dark);
-  background: rgba(6, 182, 212, 0.1);
+  color: var(--cyan);
+  background: rgba(0, 212, 255, 0.1);
 }
 
 .mini-tide.low .mini-tide-type {
-  color: var(--amber-dark);
+  color: var(--amber);
   background: rgba(245, 158, 11, 0.1);
 }
 
@@ -1506,826 +1586,4 @@ body {
   font-family: var(--mono);
 }
 
-/* ── Graphique 30 jours ── */
-.graph-30days {
-  background: var(--surface2);
-  border-radius: var(--r);
-  padding: 1.5rem;
-  margin-top: 1rem;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-
-.graph-30days-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.graph-30days-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-light);
-  position: relative;
-  padding-bottom: 0.5rem;
-}
-
-.graph-30days-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: var(--cyan);
-}
-
-.graph-30days-subtitle {
-  font-size: 0.8rem;
-  color: var(--text-light);
-  margin-top: 0.3rem;
-}
-
-.graph-30days-container {
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-}
-
-.graph-30days-svg {
-  min-width: 320px;
-  width: 100%;
-  height: 160px;
-}
-
-/* ── Section "Bon à savoir" ── */
-.know-card {
-  background: var(--surface2);
-  border-radius: var(--r);
-  padding: 2rem;
-  margin-top: 1rem;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-
-.know-card-header {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--cyan-dark);
-  margin-bottom: 1.5rem;
-  position: relative;
-  padding-bottom: 0.7rem;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.know-card-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 3px;
-  background: var(--cyan);
-  border-radius: 2px;
-}
-
-.know-content {
-  display: flex;
-  gap: 2.5rem;
-  align-items: flex-start;
-}
-
-@media (max-width: 768px) {
-  .know-content {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-}
-
-.know-image {
-  flex: 1;
-  min-width: 220px;
-  border-radius: var(--r);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  transition: transform 0.5s ease;
-}
-
-.know-image:hover {
-  transform: scale(1.02);
-}
-
-.know-image img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.5s ease;
-}
-
-.know-image:hover img {
-  transform: scale(1.05);
-}
-
-.know-text {
-  flex: 2;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: var(--text-light);
-}
-
-.know-text p {
-  margin-bottom: 1.2rem;
-}
-
-.know-text strong {
-  color: var(--cyan-dark);
-  font-weight: 600;
-}
-
-.know-fact {
-  background: rgba(6, 182, 212, 0.08);
-  border-left: 4px solid var(--cyan);
-  padding: 1.2rem;
-  margin: 1.8rem 0;
-  border-radius: 0 var(--r) var(--r) 0;
-  box-shadow: var(--shadow-sm);
-  font-style: italic;
-  color: var(--text);
-}
-
-/* ── Carte interactive ── */
-.map-card {
-  background: var(--surface2);
-  border-radius: var(--r);
-  padding: 2rem;
-  margin-top: 1rem;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-
-.map-card-header {
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-light);
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  position: relative;
-  padding-bottom: 0.5rem;
-}
-
-.map-card-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 40px;
-  height: 2px;
-  background: var(--cyan);
-}
-
-.interactive-map {
-  width: 100%;
-  height: auto;
-  border-radius: var(--r);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
-}
-
-.interactive-map:hover {
-  box-shadow: var(--shadow-lg);
-}
-
-.port-marker {
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
-}
-
-.port-marker:hover {
-  r: 10;
-  stroke-width: 3;
-  stroke: var(--cyan);
-  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5));
-}
-
-.port-marker.active {
-  r: 10;
-  stroke-width: 3;
-  fill: var(--cyan);
-  stroke
-: #ffffff;
-  filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.7));
-}
-
-.port-label {
-  transition: all 0.3s ease;
-  opacity: 0;
-  pointer-events: none;
-  font-weight: 600;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
-}
-
-.port-marker:hover + .port-label,
-.port-marker.active + .port-label {
-  opacity: 1;
-  transform: translateY(-5px);
-}
-
-/* ── Badges d'activités ── */
-.activity-badge {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  padding: 1.5rem;
-  border-radius: 0 var(--r) var(--r) 0;
-  margin-top: 1.5rem;
-  box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.activity-badge:hover {
-  transform: translateX(2px);
-  box-shadow: var(--shadow-md);
-}
-
-.fishing-badge {
-  background: rgba(245, 158, 11, 0.08);
-  border-left: 4px solid var(--amber);
-}
-
-.surfing-badge {
-  background: rgba(6, 182, 212, 0.08);
-  border-left: 4px solid var(--cyan);
-}
-
-.navigation-badge {
-  background: rgba(29, 78, 216, 0.08);
-  border-left: 4px solid var(--blue);
-}
-
-.activity-badge-icon {
-  font-size: 2.5rem;
-  animation: float 3s ease-in-out infinite;
-  padding: 0.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.fishing-badge-icon {
-  background: rgba(245, 158, 11, 0.1);
-}
-
-.surfing-badge-icon {
-  background: rgba(6, 182, 212, 0.1);
-}
-
-.navigation-badge-icon {
-  background: rgba(29, 78, 216, 0.1);
-}
-
-.activity-badge-content {
-  flex: 1;
-}
-
-.activity-badge-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.4rem;
-  position: relative;
-  padding-bottom: 0.3rem;
-}
-
-.activity-badge-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
-}
-
-.fishing-badge-title::after {
-  background: var(--amber);
-}
-
-.surfing-badge-title::after {
-  background: var(--cyan);
-}
-
-.navigation-badge-title::after {
-  background: var(--blue);
-}
-
-.fishing-badge-title {
-  color: var(--amber-dark);
-}
-
-.surfing-badge-title {
-  color: var(--cyan-dark);
-}
-
-.navigation-badge-title {
-  color: var(--blue-dark);
-}
-
-.activity-badge-time {
-  font-size: 1.8rem;
-  font-weight: 800;
-  font-family: var(--mono);
-  color: var(--text);
-  margin-bottom: 0.3rem;
-  background: linear-gradient(135deg, var(--text), var(--cyan-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.fishing-badge-time {
-  background: linear-gradient(135deg, var(--text), var(--amber-dark));
-}
-
-.navigation-badge-time {
-  background: linear-gradient(135deg, var(--text), var(--blue-dark));
-}
-
-.activity-badge-info {
-  font-size: 0.9rem;
-  color: var(--text-light);
-  font-family: var(--mono);
-}
-
-/* ── Animation flottante ── */
-@keyframes float {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-5px) rotate(2deg);
-  }
-  66% {
-    transform: translateY(-3px) rotate(-2deg);
-  }
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-}
-
-/* ── Status API ── */
-.api-status {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
-
-.api-status.success {
-  color: var(--green-dark);
-  border-color: rgba(16, 185, 129, 0.2);
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.api-status.error {
-  color: var(--red-dark);
-  border-color: rgba(239, 68, 68, 0.2);
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.api-status.warning {
-  color: var(--amber-dark);
-  border-color: rgba(245, 158, 11, 0.2);
-  background: rgba(245, 158, 11, 0.1);
-}
-
-.api-status::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 0.5rem;
-  box-shadow: 0 0 4px currentColor;
-}
-
-.api-status.success::before { background: var(--green); }
-.api-status.error::before { background: var(--red); }
-.api-status.warning::before { background: var(--amber); }
-
-/* ── Footer ── */
-footer {
-  text-align: center;
-  padding: 2.5rem;
-  font-size: 0.8rem;
-  color: var(--text-light);
-  border-top: 1px solid var(--border);
-  margin-top: 3rem;
-  position: relative;
-  background: var(--surface);
-}
-
-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(180deg, transparent, var(--surface));
-  pointer-events: none;
-}
-
-footer strong {
-  color: var(--cyan-dark);
-  font-weight: 600;
-}
-
-footer a {
-  color: var(--cyan);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-footer a:hover {
-  color: var(--cyan-dark);
-  text-decoration: underline;
-  transform: translateY(-1px);
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.footer-links a {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-/* ── Responsive adjustments ── */
-@media (max-width: 1024px) {
-  .hero-port {
-    font-size: 2.8rem;
-  }
-  .hero-time {
-    font-size: 2.2rem;
-  }
-  .top-grid {
-    grid-template-columns: 240px 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero {
-    padding: 2rem 0 4rem;
-  }
-  .hero-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .hero-date {
-    text-align: left;
-    margin-top: 1rem;
-  }
-  .hero-port {
-    font-size: 2.2rem;
-  }
-  .hero-time {
-    font-size: 1.8rem;
-  }
-  .container {
-    padding: 0 1rem;
-  }
-  .top-grid {
-    grid-template-columns: 1fr;
-  }
-  .coeff-number {
-    font-size: 4rem;
-  }
-  .tide-time {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  :root {
-    --r: 12px;
-  }
-  .hero-port {
-    font-size: 1.8rem;
-  }
-  .hero-time {
-    font-size: 1.5rem;
-  }
-  .coeff-number {
-    font-size: 3rem;
-  }
-  .tide-time {
-    font-size: 1.3rem;
-  }
-  .port-nav-inner {
-    padding: 0 0.5rem;
-  }
-  .port-btn {
-    padding: 0.8rem 1rem;
-    font-size: 0.8rem;
-  }
-  .card-header {
-    padding: 1rem;
-  }
-  .card-body {
-    padding: 1rem;
-  }
-}
-</style>
-</head>
-<body>
-<div class="hero">
-  <div class="hero-content">
-    <div class="hero-top">
-      <div>
-        <div class="site-brand"><?= SITE_NAME ?></div>
-        <h1 class="hero-port" data-icon="<?= esc($port['icon']) ?>"><?= esc($port['name']) ?></h1>
-        <div class="hero-region"><?= esc($port['region']) ?></div>
-      </div>
-      <div>
-        <div class="hero-date"><?= esc($date_label) ?></div>
-        <div class="hero-time" id="current-time"><?= date('H:i') ?></div>
-      </div>
-    </div>
-  </div>
-  <div class="waves">
-    <svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg">
-      <path class="wave-path" d="M0,60 C300,120 900,0 1200,60 L1200,120 L0,120 Z" />
-      <path class="wave-path" d="M0,70 C400,130 800,10 1200,70 L1200,120 L0,120 Z" style="animation-delay: -2s" />
-      <path class="wave-path" d="M0,80 C200,140 1000,20 1200,80 L1200,120 L0,120 Z" style="animation-delay: -4s" />
-    </svg>
-  </div>
-</div>
-
-<nav class="port-nav">
-  <div class="port-nav-inner">
-    <?php foreach ($PORTS as $key => $p): ?>
-      <a href="?port=<?= esc($key) ?>" class="port-btn <?= $key === $port_key ? 'active' : '' ?>">
-        <?= esc($p['icon']) ?> <?= esc($p['name']) ?>
-      </a>
-    <?php endforeach; ?>
-  </div>
-</nav>
-
-<div class="container">
-  <div class="top-grid">
-    <div class="card glass-card">
-      <div class="card-header">
-        <span>Coefficient de marée</span>
-      </div>
-      <div class="card-body coeff-card coeff-<?= coeffClass($today_data['coeff']) ?>">
-        <div class="coeff-gauge-container">
-          <?= $coeffGauge ?>
-        </div>
-        <div class="coeff-number"><?= $today_data['coeff'] ?></div>
-        <div class="coeff-label"><?= coeffLabel($today_data['coeff']) ?></div>
-        <div class="coeff-title">Aujourd'hui</div>
-        <div class="coeff-gauge-info">
-          <span><span class="pip pip-morte"></span> Mortes eaux</span>
-          <span><span class="pip pip-moyen"></span> Moyen</span>
-          <span><span class="pip pip-fort"></span> Fort</span>
-          <span><span class="pip pip-vive"></span> Vives eaux</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card glass-card">
-      <div class="card-header">
-        <span>Marées du jour</span>
-      </div>
-      <div class="card-body">
-        <?= generateTideProgressBar($today_data, $port) ?>
-
-        <div class="tides-grid">
-          <?php foreach ($today_data['tides'] as $i => $tide): ?>
-            <div class="tide-item <?= $tide['type'] ?>">
-              <div class="tide-badge"><?= $tide['type'] === 'high' ? 'Pleine mer' : 'Basse mer' ?></div>
-              <div class="tide-time"><?= esc($tide['time']) ?></div>
-              <div class="tide-height"><?= number_format($tide['height'], 2) ?> m</div>
-            </div>
-          <?php endforeach; ?>
-        </div>
-
-        <div class="curve-wrap">
-          <svg class="curve-svg" viewBox="0 0 960 160" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="curveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
-                <stop offset="100%" stop-color="#0891b2" stop-opacity="0.8" />
-              </linearGradient>
-            </defs>
-            <path d="<?= $svg_path ?>" fill="none" stroke="url(#curveGrad)" stroke-width="3" class="curve-path" />
-            <?php foreach ($today_data['tides'] as $i => $tide): ?>
-              <circle cx="<?= round($i / (count($today_data['tides']) - 1) * 960, 1) ?>" cy="<?= round(160 - 14 - ($tide['height'] - $port['range_low']) / $rng * 132, 1) ?>" r="5" fill="<?= $tide['type'] === 'high' ? '#06b6d4' : '#f59e0b' ?>" class="tide-point" />
-            <?php endforeach; ?>
-            <line x1="<?= $now_x ?>" y1="0" x2="<?= $now_x ?>" y2="160" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-dasharray="3,3" class="now-cursor" />
-            <text x="<?= $now_x ?>" y="20" font-size="12" fill="#ffffff" text-anchor="middle" class="now-text">Maintenant</text>
-          </svg>
-          <div class="axis-hours">
-            <span>00:00</span>
-            <span>06:00</span>
-            <span>12:00</span>
-            <span>18:00</span>
-            <span>24:00</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card glass-card">
-    <div class="card-header">
-      <span>Prévisions sur 7 jours</span>
-    </div>
-    <div class="card-body">
-      <table class="days-table">
-        <?php foreach ($days as $day): ?>
-          <tr>
-            <td class="td-day"><?= esc($day['label']) ?></td>
-            <td class="td-coeff">
-              <span class="coeff-pip">
-                <span class="pip pip-<?= coeffClass($day['coeff']) ?>"></span>
-                <?= $day['coeff'] ?>
-              </span>
-            </td>
-            <td class="td-tides">
-              <?php foreach ($day['tides'] as $tide): ?>
-                <div class="mini-tide <?= $tide['type'] ?>">
-                  <div class="mini-tide-type"><?= $tide['type'] === 'high' ? 'PM' : 'BM' ?></div>
-                  <div class="mini-tide-time"><?= esc($tide['time']) ?></div>
-                  <div class="mini-tide-h"><?= number_format($tide['height'], 2) ?> m</div>
-                </div>
-              <?php endforeach; ?>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      </table>
-    </div>
-  </div>
-
-  <div class="card glass-card">
-    <div class="card-header">
-      <span>Évolution sur 30 jours</span>
-    </div>
-    <div class="card-body">
-      <div class="graph-30days">
-        <div class="graph-30days-header">
-          <div>
-            <div class="graph-30days-title">Coefficients de marée</div>
-            <div class="graph-30days-subtitle">Cycle lunaire complet</div>
-          </div>
-        </div>
-        <div class="graph-30days-container">
-          <?= $graph30Days ?>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card glass-card">
-    <div class="card-header">
-      <span>Bon à savoir</span>
-    </div>
-    <div class="card-body know-card">
-      <div class="know-content">
-        <div class="know-image">
-          <img src="https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Port de <?= esc($port['name']) ?>">
-        </div>
-        <div class="know-text">
-          <p><strong><?= esc($port['name']) ?></strong> est un port situé en <strong><?= esc($port['region']) ?></strong>, connu pour <?= esc(strtolower($port['desc'])) ?>. Les marées y sont particulièrement importantes avec des coefficients pouvant atteindre <strong><?= $port['range_high'] ?> m</strong> en période de vives eaux.</p>
-          <p>Les marées sont causées par l'attraction gravitationnelle de la Lune et du Soleil sur les océans. À <?= esc($port['name']) ?>, le marnage (différence entre haute et basse mer) peut varier considérablement selon les périodes du mois lunaire.</p>
-          <div class="know-fact">
-            Saviez-vous que le coefficient de marée à <?= esc($port['name']) ?> peut atteindre jusqu'à 120 en période de vives eaux, ce qui indique des marées particulièrement fortes ?
-          </div>
-          <p>Pour les activités nautiques, il est recommandé de consulter les horaires de marée avant de planifier vos sorties. Les périodes autour des pleines et nouvelles lunes sont généralement les plus propices aux marées fortes.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card glass-card">
-    <div class="card-header">
-      <span>Carte interactive</span>
-    </div>
-    <div class="card-body map-card">
-      <?= $interactiveMap ?>
-      <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-light); text-align: center;">
-        Cliquez sur un port pour afficher ses horaires de marée
-      </div>
-    </div>
-  </div>
-
-  <div class="card glass-card">
-    <div class="card-header">
-      <span>Activités recommandées</span>
-    </div>
-    <div class="card-body">
-      <?= $fishingBadge ?>
-      <?= $surfingBadge ?>
-      <?= $navigationBadge ?>
-    </div>
-  </div>
-</div>
-
-<footer>
-  <div>© <?= date('Y') ?> <strong><?= SITE_NAME ?></strong> — v<?= VERSION ?></div>
-  <div class="footer-links">
-    <a href="#">À propos</a>
-    <a href="#">Contact</a>
-    <a href="#">Conditions d'utilisation</a>
-    <a href="#">Confidentialité</a>
-    <a href="#">API WorldTides</a>
-  </div>
-</footer>
-
-<div class="api-status <?= isset($apiData['status']) && $apiData['status'] === 'error' ? 'error' : 'success' ?>">
-  <?= isset($apiData['status']) && $apiData['status'] === 'error' ? 'Données simulées' : 'Données temps réel' ?>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Mise à jour de l'heure en temps réel
-  function updateTime() {
-    const now = new Date();
-    const timeString = now.getHours().toString().padStart(2, '0') + ':' +
-                       now.getMinutes().toString().padStart(2, '0');
-    document.getElementById('current-time').textContent = timeString;
-  }
-  updateTime();
-  setInterval(updateTime, 1000);
-
-  // Animation des badges d'activités
-  const badges = document.querySelectorAll('.activity-badge');
-  badges.forEach(badge => {
-    badge.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateX(4px)';
-    });
-    badge.addEventListener('mouseleave', function() {
-      this.style.transform = 'translateX(2px)';
-    });
-  });
-
-  // Animation des cartes
-  const cards = document.querySelectorAll('.card, .glass-card');
-  cards.forEach(card => {
-    card.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-6px)';
-    });
-    card.addEventListener('mouseleave', function() {
-      this.style.transform = 'translateY(-4px)';
-    });
-  });
-
-  // Animation des boutons de navigation
-  const portButtons = document.querySelectorAll('.port-btn');
-  portButtons.forEach(button => {
-    button.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-3px)';
-    });
-    button.addEventListener('mouseleave', function() {
-      if (!this.classList.contains('active')) {
-        this.style.transform = 'translateY(0)';
-      }
-    });
-  });
-});
-</script>
-</body>
-</html>
+/* ──
