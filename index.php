@@ -4,7 +4,7 @@
  * Version améliorée avec intégration API WorldTides et gestion complète des ports
  */
 
-define('VERSION',    '2.0.0');
+define('VERSION',    '3.0.0');
 define('API_URL',    'https://api.mistral.ai/v1/chat/completions');
 define('DB_FILE',    __DIR__ . '/chat.sqlite');
 define('MAX_TOKENS', 4096);
