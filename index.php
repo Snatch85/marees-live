@@ -4,7 +4,7 @@
  * Version améliorée avec intégration API WorldTides et gestion complète des ports
  */
 
-define('VERSION',    '3.0.0');
+define('VERSION',    '3.1.0');
 define('API_URL',    'https://api.mistral.ai/v1/chat/completions');
 define('DB_FILE',    __DIR__ . '/chat.sqlite');
 define('MAX_TOKENS', 4096);
@@ -175,6 +175,29 @@ function calculateTideCoefficient(float $lat, float $lon, string $date): array {
         'coefficient' => $coeff,
         'port' => $port['lat'] . ',' . $port['lon']
     ];
+}
+
+// ── Fonction pour calculer les coefficients entre marées ────────────────────
+function calculateCoefficients(array $extremes, float $ref_marnage): array {
+    $coefficients = [];
+    for ($i = 1; $i < count($extremes); $i++) {
+        if ($extremes[$i]['type'] === 'Low') {
+            $prev_high = null;
+            for ($j = $i-1; $j >= 0; $j--) {
+                if ($extremes[$j]['type'] === 'High') {
+                    $prev_high = $extremes[$j];
+                    break;
+                }
+            }
+            if ($prev_high) {
+                $hm = $prev_high['height'];
+                $bm = $extremes[$i]['height'];
+                $coeff = round(($hm - $bm) / $ref_marnage * 95);
+                $coefficients[$extremes[$i]['dt']] = max(20, min(120, $coeff));
+            }
+        }
+    }
+    return $coefficients;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -405,6 +428,9 @@ if (isset($tide_data['error']) || $tide_data === [] || WORLDTIDES_KEY === 'VOTRE
     $source_type = 'estimated';
 } else {
     $source_type = 'official';
+    // Calcul des coefficients entre marées
+    $coefficients = calculateCoefficients($tide_data['extremes'] ?? [], $port_data['ref_marnage']);
+    $tide_data['coefficients'] = $coefficients;
 }
 ?>
 <!DOCTYPE html>
@@ -847,9 +873,9 @@ body{background:var(--bg);color:var(--text);display:flex}
           <div class="extreme-time"><?= date('H\\hi', $extreme['dt']) ?></div>
           <div class="extreme-type"><?= $extreme['type'] === 'High' ? 'Haute Mer' : 'Basse Mer' ?></div>
           <div class="extreme-height"><?= h($extreme['height']) ?> m</div>
-          <?php if ($extreme['type'] === 'Low' && isset($tide_data['coefficient'])): ?>
+          <?php if ($extreme['type'] === 'Low' && isset($tide_data['coefficients'][$extreme['dt']])): ?>
           <div style="font-size:.65rem;color:var(--muted);margin-top:.3rem">
-            Coeff <?= h($tide_data['coefficient']) ?>
+            Coeff <?= h($tide_data['coefficients'][$extreme['dt']]) ?>
           </div>
           <?php endif; ?>
         </div>
@@ -1139,35 +1165,4 @@ function appendMessage(role, content, scroll=true) {
     const avatar = role === 'user' ? '👤' : 'C';
     const avClass = role === 'user' ? 'user' : 'ai';
     const rendered = role === 'user'
-        ? `<p>${esc(content).replace(/\n/g,'<br>')}</p>`
-        : renderMd(content);
-
-    div.innerHTML = `
-      <div class="msg-avatar ${avClass}">${avatar}</div>
-      <div class="msg-content">
-        <div class="msg-name">${name}</div>
-        <div class="msg-text">${rendered}</div>
-      </div>`;
-    container.appendChild(div);
-    if (scroll) scrollBottom();
-}
-
-function appendThinking(id) {
-    const container = document.getElementById('msgContainer');
-    const div = document.createElement('div');
-    div.className = 'msg'; div.id = id;
-    div.innerHTML = `<div class="msg-avatar ai">C</div>
-      <div class="msg-content">
-        <div class="msg-name">ClaudeLocal</div>
-        <div class="msg-text"><div class="thinking-dots"><span></span><span></span><span></span></div></div>
-      </div>`;
-    container.appendChild(div);
-}
-function removeThinking(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-}
-function appendError(msg) {
-    const container = document.getElementById('msgContainer');
-    const div = document.createElement('div');
-    div.style.cssText = 'max-width:760px;margin:0 auto;padding:.5rem 1.5rem';
+        ? `<p>${esc(content).replace
