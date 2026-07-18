@@ -4,7 +4,7 @@
  * Version améliorée avec intégration API WorldTides et gestion complète des ports
  */
 
-define('VERSION',    '9.0.0');
+define('VERSION',    '10.0.0');
 define('API_URL',    'https://api.mistral.ai/v1/chat/completions');
 define('DB_FILE',    __DIR__ . '/chat.sqlite');
 define('MAX_TOKENS', 4096);
@@ -1165,4 +1165,4 @@ function appendMessage(role, content, scroll=true) {
     const avatar = role === 'user' ? '👤' : 'C';
     const avClass = role === 'user' ? 'user' : 'ai';
     const rendered = role === 'user'
-        ? `<p>${esc(content)}</
+        ? `<p>${esc(content)}
