@@ -4,7 +4,7 @@
  * Version améliorée avec intégration API WorldTides et gestion complète des ports
  */
 
-define('VERSION',    '10.0.0');
+define('VERSION',    '11.0.0');
 define('API_URL',    'https://api.mistral.ai/v1/chat/completions');
 define('DB_FILE',    __DIR__ . '/chat.sqlite');
 define('MAX_TOKENS', 4096);
@@ -22,7 +22,7 @@ $PERSONAS = [
     'assistant' => [
         'label'  => 'Assistant général',
         'icon'   => '🤖',
-        'prompt' => 'Tu es un assistant IA intelligent, précis et bienveillant. Tu réponds en français par défaut. Tu structures tes réponses avec des titres, listes et code quand c\'est utile.',
+        'prompt' => 'Tu es un assistant IA intelligent, précis et bienveillant. Tu réponds en français par défaut. Tu structuress tes réponses avec des titres, listes et code quand c\'est utile.',
     ],
     'dev' => [
         'label'  => 'Développeur PHP',
@@ -203,6 +203,10 @@ function calculateCoefficients(array $extremes, float $ref_marnage): array {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function h(string $s): string {
     return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+}
+
+function esc(string $s): string {
+    return h($s);
 }
 
 function timeAgo(string $dt): string {
@@ -1164,5 +1168,3 @@ function appendMessage(role, content, scroll=true) {
     const name   = role === 'user' ? 'Vous' : 'ClaudeLocal';
     const avatar = role === 'user' ? '👤' : 'C';
     const avClass = role === 'user' ? 'user' : 'ai';
-    const rendered = role === 'user'
-        ? `<p>${esc(content)}
